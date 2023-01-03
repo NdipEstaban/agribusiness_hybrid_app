@@ -7,7 +7,7 @@ const LogIn:React.FC = () => {
             <IonContent>
                 <form className='login-page'>
                     <h1>Welcome Back</h1>
-                    <label>
+                      <label>
                         Username
                         <input type='text' placeholder="enter your username"/>
                     </label>
