@@ -1,0 +1,30 @@
+.user__profile-toolbar{
+    height:4rem !important;
+}
+
+.user__profile__specs-list{
+    height:24rem;
+    display:flex;
+    flex-wrap:wrap;
+    overflow:auto;
+    justify-content: space-evenly;
+    align-items:flex-start;
+    margin-top:1rem;
+}
+
+.user_profile-title{
+    font-weight:bold;
+    font-size:1.5rem;
+    margin:2rem 0 0.5rem  0.5rem !important;
+}
+
+.send-message{
+    margin-top:2rem;
+    height:3rem;
+    font-size:1.2rem;
+    width:90%;
+
+    position:relative;
+    left: 50%;
+    transform:translateX(-50%)
+}

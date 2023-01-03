@@ -1,0 +1,14 @@
+.search__results{
+    display: flex;
+    flex-direction:column;
+
+    .search__results-radio{
+        display:block !important;
+    }
+
+    .results__list{
+        display:flex;
+        flex-direction:row;
+        align-items: center;
+    }
+}

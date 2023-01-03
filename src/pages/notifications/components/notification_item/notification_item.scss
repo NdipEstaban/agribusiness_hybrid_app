@@ -1,0 +1,39 @@
+ion-item{
+    width:23.5rem;
+    max-width:50rem;
+    box-shadow:0px 0px 5px grey;
+    border-radius:10px;
+    margin-bottom:1rem;
+
+    div{
+        display:flex;
+        flex-direction:column;
+        padding:0.5rem;
+        
+    }
+
+    .name-message{
+        width:20rem;
+        height:100%;
+
+        .message{
+            font-size:1
+        }
+
+        .name{
+            font-size:1.3rem;
+            font-weight:bold;
+        }
+    }
+
+    .time-trash{
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        height:90%;
+    }
+
+    ion-button{
+        font-size:1.2rem;
+    }
+}

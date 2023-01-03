@@ -1,0 +1,12 @@
+ion-searchbar{
+    .searchbar-input-container{
+        margin-top:0.5rem;
+        .searchbar-input{
+            border-radius: 25px !important;
+            box-shadow:none !important;
+            border:2px solid #e6e2e2 !important;
+            background:#e6e2e2;
+            font-size:1.3rem;
+        }
+    }
+}

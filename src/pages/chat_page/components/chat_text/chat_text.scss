@@ -1,0 +1,36 @@
+$message-read:rgb(182, 255, 99);
+
+.chat__message__box{
+    width:12rem;
+    padding:0.5rem;
+    border-radius:22px;
+    color:black;
+    margin:0.5rem 0.1rem;
+
+    .chat__message__box-text{
+        margin-right:0.2rem;
+        font-size:1rem;
+    }
+
+    .chat__message__box-details{
+        text-align:right;
+        margin:1rem 0rem 0rem 0rem;
+
+        display:flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        grid-gap:0.5rem;
+    }
+}
+
+.sender{
+    position:relative;
+    left:50%;
+    background:linear-gradient(120deg, #003ffc 0%, #4d8dfc);
+    color:white;
+
+    .chat-icon{
+        display:inline-block;
+        color:$message-read;
+    }
+}

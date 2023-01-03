@@ -1,0 +1,40 @@
+.account-page{
+    background:white;
+    height:100%;
+    width:100vw;
+    font-family: 'Segoe UI';
+}
+
+.account-page .logo{
+    max-width: 30rem;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    display:block;
+    margin:auto;
+}
+
+.logo-background{
+    background-color: rgb(201, 201, 201);
+    height:15rem;
+}
+
+.welcome-text{
+    padding:3rem 1rem 3rem 1rem;
+   color:black;
+   font-size:1.2rem;
+}
+
+.btn-section{
+    padding-top:3rem;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.account-btns{
+    width:20rem;
+    height:4rem;
+    font-weight:bold;
+}

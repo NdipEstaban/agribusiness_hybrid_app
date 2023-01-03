@@ -1,0 +1,46 @@
+.recent__transaction__item{
+    min-width:117%;
+    height:5rem;
+    margin-bottom:1rem;
+    margin-left:1rem;
+
+    display:flex;
+    flex-direction:row;
+
+    .recent__transaction__item-image{
+        height:90%;
+        border:1px solid black;
+        width:6rem;
+        height:4rem;
+        border-radius:20px;
+        margin-left:1rem;
+
+        
+    }
+
+    .recent__transaction__item-details{
+        display:flex;
+        justify-content:space-evenly;
+        height:100%;
+        align-items:flex-start;
+        flex-direction: column;
+        width:14rem;
+
+        .recent__transaction-details-name{
+            font-weight:bold;
+            font-size:1.3rem;
+        }
+
+        .recent__transaction-details-amount{
+            font-size:1.1rem;
+        }
+    }
+
+    .recent__transaction-date{
+        height:70%;
+        color:grey;
+        display:flex;
+        justify-content: flex-start;
+        height:100%;
+    }
+}

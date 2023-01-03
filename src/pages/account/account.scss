@@ -1,0 +1,70 @@
+ion-toolbar{
+    ion-button{
+        font-size:1.5rem;
+        --padding-end:0.5rem;
+        --padding-start:0.5rem;
+        --padding-top:0.5rem;;
+        --padding-bottom:0.5rem;
+
+        margin:0 0.5rem 0 0;
+    }
+}
+
+ion-content{
+    h1{
+        font-weight:bold;
+        margin-left:0.5rem;
+    }
+}
+
+/*Styling the modal */
+
+.edit__account__modal-image{
+    display:flex;
+    flex-direction:column;
+
+    .edit__account__modal-image-img{
+        margin-top:3rem;
+        display:flex;
+        justify-content:center;
+        align-items: center;
+    }
+
+    ion-img::part(image){
+        border-radius:15px;
+        width:10rem;
+    }
+}
+
+.edit__account__label{
+    font-weight:bold;
+    font-size:1.2rem !important;
+}
+
+.edit__account-title{
+    color:rgb(80, 79, 79) !important;
+    font-size:1.3rem;
+    text-align:center;
+}
+
+.edit__account__modal-textarea{
+    height:10rem !important;
+    -padding-start:0;
+    -padding-end:0;
+    -padding-left:0 !important;
+    -padding-right:0 !important;
+}
+
+.edit__modal__buttons{
+    margin-top:1rem;
+    display:flex;
+    flex-direction:column;
+    width:90%;
+    height:10rem;
+}
+
+.account__modal__buttons{
+    font-size:1.2rem !important;
+    display:block;
+    height:3.5rem !important;
+}

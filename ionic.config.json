@@ -1,0 +1,7 @@
+{
+  "name": "agribusiness",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

@@ -1,0 +1,28 @@
+.add-pic-page{
+    display:flex;
+    flex-direction:column;
+
+    justify-content:center;
+    align-items:center;
+    margin-top:10rem;
+}
+
+.add-pic-page h3{
+    text-align:center;
+    font-weight:bold;
+    margin-top:0.5rem;
+}
+
+.picture-wrapper{
+    height:18rem;
+    width:18rem;
+}
+
+.picture{
+    height:15rem;
+    color:black;
+}
+
+.confirm-btn{
+    margin-top:8rem;
+}

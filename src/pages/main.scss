@@ -1,0 +1,81 @@
+*{
+    font-family: 'Segoe UI';
+}
+
+.input-error-message{
+  text-align:right;
+  font-weight:normal;
+  font-size:1rem;
+  font-weight:500;
+  color:orangered;
+  margin:0;
+}
+
+ion-tab-bar#app-tab-bar{
+  border:0;
+  --background: #ffffff;
+  box-shadow:  5px 5px 10px #c9c9c9,
+                -5px -5px 10px #ffffff;
+}
+
+
+//Action buttons
+ion-fab{
+  position:fixed;
+  bottom:5rem;
+  right:1rem;
+  
+  ion-fab-button{
+      width:4rem;
+      height:4rem;
+      font-size:2rem;
+  }
+}
+
+ion-item{
+  box-shadow:none;
+  border:0;
+}
+
+//Designing the modal
+ion-modal#product-card-modal{
+    --width: fit-content;
+    --max-width: 20rem;
+    --height: fit-content;
+    --border-radius: 20px;
+    --box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+}
+
+//Customising the action sheet
+
+ion-action-sheet.my-custom-class .action-sheet-group {
+    background: #ffffff;
+    display:block;
+  }
+  
+  ion-action-sheet.my-custom-class .action-sheet-title {
+    font-size:1.4rem;
+    color: rgb(60, 122, 255);
+  }
+  
+  ion-action-sheet.my-custom-class .action-sheet-cancel::after {
+    background: #ffffff;
+  }
+  
+  ion-action-sheet.my-custom-class .action-sheet-button,
+  ion-action-sheet.my-custom-class .action-sheet-button.ion-focused {
+    color: #000000;
+  }
+  
+  @media (any-hover: hover) {
+    ion-action-sheet.my-custom-class .action-sheet-button:hover {
+      color: #000000;
+    }
+  }
+  
+  ion-action-sheet.my-custom-class ion-backdrop {
+    opacity: 0.6;
+  }
+
+
+
