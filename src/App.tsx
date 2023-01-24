@@ -30,9 +30,6 @@ import { Route, Redirect } from 'react-router-dom';
 import Notifications from './pages/notifications/notifications';
 import Welcome from './pages/welcome/welcome';
 import {CreateAccount} from './pages/create_account/create_account';
-import Proffession from './pages/proffession/proffession';
-import AddPic from './pages/add_profile_pic/add_profile_pic';
-import LogIn from './pages/log_in/log_in';
 
 setupIonicReact();
 
@@ -47,17 +44,8 @@ const App: React.FC = () => (
         <Route exact path='/new'>
           <Welcome />
         </Route>
-        <Route exact path='/new/log-in'>
-          <LogIn />
-        </Route>
         <Route exact path='/new/create-account'>
           <CreateAccount/>
-        </Route>
-        <Route exact path='/new/create-account/proffession'>
-          <Proffession />
-        </Route>
-        <Route exact path='/new/create-account/add-picture'>
-          <AddPic/>
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>

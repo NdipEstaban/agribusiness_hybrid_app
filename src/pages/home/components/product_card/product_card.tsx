@@ -11,24 +11,27 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import img from '../../../../assets/images/abic_logo.png';
 import tomatoes from '../../../../assets/images/tomatoes.png';
 import './product_card.scss';
+import { useAppSelector } from '../../../../hooks/redux_hooks';
+import { useGetUserByIdQuery } from '../../../../redux/api/user/userSlice';
 
 
 
 interface ProductCardProps{
     name:string,
     price:string,
-    cardIcon:string,
+    description:string,
+    merchantId:string,
+    image:string,
+    tab:string,
 
     cardAction?:(param:string) => void
 }
 
-interface ProductProps{
-    name:string,
-    price:string,
-    action:(param:string) => void
-}
 
-const ProductCard:React.FC<ProductCardProps> = (props):JSX.Element => {
+const ProductCard:React.FC<ProductCardProps> = ({price, name, description, merchantId, image, tab}):JSX.Element => {
+
+    const userRole = useAppSelector(state => state.user.role);
+    const {data:merchant} = useGetUserByIdQuery(merchantId);
 
     const productModal = useRef<HTMLIonModalElement>(null);
 
@@ -47,18 +50,18 @@ const ProductCard:React.FC<ProductCardProps> = (props):JSX.Element => {
 
     return(
         <div className='card'>
-            <IonImg id='card' src={img} /> 
+            <IonImg id='card' src={image} /> 
             <div id='details'>
                 <div id='name-price'>
-                    <IonText id='name'>{props.name}</IonText>
-                    <IonText id='price'>{props.price}/kg</IonText>
+                    <IonText id='name'>{name}</IonText>
+                    <IonText id='price'>{price}/kg</IonText>
                 </div>
                     {
                     /*Only the producer can delete products he added from his account*/
                     /*Only the merchant can add products to his cart*/
                     /*The livreur can't do anything to the products*/
                     }
-                    {props.cardIcon === 'delete'?
+                    {(userRole === 'merchant' && tab === 'myproduct')?
                     <IonButton color='white' fill='clear' onClick={
                         () => {
                             present({
@@ -81,7 +84,7 @@ const ProductCard:React.FC<ProductCardProps> = (props):JSX.Element => {
                     }>
                         <FontAwesomeIcon icon={faTrash} />
                     </IonButton>
-                    :(props.cardIcon === 'addCart'?
+                    :(userRole === "consumer"?
                     <IonButton color='white' fill='clear'>
                         <FontAwesomeIcon icon={faTrash} />
                     </IonButton>
@@ -95,8 +98,8 @@ const ProductCard:React.FC<ProductCardProps> = (props):JSX.Element => {
                         
                         <div className='modal__header'>
                             <div className='modal__header-images'>
-                                <IonImg className='modal__header-author-img' src={img} onClick={goToAuthorProfile}/>
-                                <IonImg className='modal__header-product-img' src={tomatoes} />
+                                <IonImg className='modal__header-author-img' src={merchant?.profile_picture} onClick={goToAuthorProfile}/>
+                                <IonImg className='modal__header-product-img' src={image} />
                             </div>
                             <div className='modal__header-props'>
                                 <div className='modal__header-props-text'>

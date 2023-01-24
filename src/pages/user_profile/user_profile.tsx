@@ -4,6 +4,8 @@ import {useHistory, useLocation} from 'react-router-dom';
 
 import { hideTabBar,showTabBar } from '../../utils/iontabbar-controller';
 
+import tomatoes from '../../assets/images/tomatoes.png';
+
 import './user_profile.scss';
 
 import ProductCard from '../home/components/product_card/product_card';
@@ -44,11 +46,7 @@ const UserProfile:React.FC = () => {
                 <AccountCard />
                 <IonText className='user_profile-title'>My Products</IonText>
                 <IonList className='user__profile__specs-list'>
-                    <ProductCard name='banane' price='7000' cardIcon='delete' cardAction={() => cardAction()} />
-                    <ProductCard name='banane' price='7000' cardIcon='delete' cardAction={() => cardAction()} />
-                    <ProductCard name='banane' price='7000' cardIcon='delete' cardAction={() => cardAction()} />
-                    <ProductCard name='banane' price='7000' cardIcon='delete' cardAction={() => cardAction()} />
-                    <ProductCard name='banane' price='7000' cardIcon='delete' cardAction={() => cardAction()} />
+                <ProductCard name='banane' price='7000' description="Nice banana" image={tomatoes} merchantId="1" tab="featured" cardAction={() => {}} />
                 </IonList>
                 <IonButton className='send-message'>
                     <FontAwesomeIcon icon={faMessage} />

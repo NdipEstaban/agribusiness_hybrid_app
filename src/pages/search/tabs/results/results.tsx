@@ -6,6 +6,8 @@ import RadioButton from '../../../../components/radio_button/radio_button';
 import ProductCard from '../../../home/components/product_card/product_card';
 import UserAccountItem from '../../components/user_account_item/user_account_item';
 
+import tomatoes from '../../../../assets/images/tomatoes.png';
+
 import './results.scss';
 
 const SearchResults:React.FC = () => {
@@ -25,10 +27,7 @@ const SearchResults:React.FC = () => {
             </IonList>
             :
             <IonList lines='none' className='results__list'>
-                <ProductCard name='banane' price='7000' cardIcon='delete' cardAction={setCurrentTab} />
-                <ProductCard name='banane' price='7000' cardIcon='delete' cardAction={setCurrentTab} />
-                <ProductCard name='banane' price='7000' cardIcon='delete' cardAction={setCurrentTab} />
-                <ProductCard name='banane' price='7000' cardIcon='delete' cardAction={setCurrentTab} />
+                    <ProductCard name='banane' price='7000' description="Nice banana" image={tomatoes} merchantId="1" tab="featured" cardAction={() => {}} />
             </IonList>
             )}
         </div>

@@ -14,8 +14,10 @@ import Notifications from "../notifications/notifications";
 
 
 import "./home.scss";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux_hooks";
 
 const Home:React.FC = () => {
+    const user = useAppSelector(state => state.user);
 
     const [currentHome, setCurrentHome] = React.useState('Featured');
     const match = useRouteMatch();
@@ -37,7 +39,10 @@ const Home:React.FC = () => {
                 </IonToolbar>
             </IonHeader>
             <IonContent className="home__container">
-                <RadioButton option1="Featured" option2="My products" setHome={setCurrentHome}/>
+                {
+                    user.role === 'merchant' && 
+                    <RadioButton option1="Featured" option2="My products" setHome={setCurrentHome}/>
+                }
                 {
                 currentHome === 'Featured'?
                 <Featured cardAction={setCurrentHome}/>
