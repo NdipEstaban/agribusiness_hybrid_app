@@ -13,7 +13,7 @@
 .radio-btn{
     width:9rem;
     height:2rem;
-    box-shadow: 1px 1px 5px #383838;
+    box-shadow: 1px 1px 5px #a4a4a4;
     background:white;
     color:black;
     font-size:1.2rem;
@@ -23,7 +23,7 @@
     align-items: center;
     font-weight: bold;
 
-    transition: all 1s ease;
+    transition: all 0.5s ease;
 }
 
 .radio-btn-container .option-1{
@@ -35,8 +35,10 @@
 }
 
 .radio-btn-selected{
-    background: #005cfc;
+    background: #3c7aff;
     color:white;
+    box-shadow: 2px 2px 5px #1f418b;
+
 }
 
 

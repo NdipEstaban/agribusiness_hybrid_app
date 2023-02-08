@@ -1,8 +1,10 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import { useSelector } from 'react-redux';
+import { encryptResponse, decryptRequest } from '../../../utils/crypto_utility';
+
 
 const authSlice = createApi({
-    reducerPath: 'auth',
+    reducerPath: 'authApi',
     baseQuery:fetchBaseQuery({baseUrl: "http://localhost:7000/auth"}),
     tagTypes:['Auth'],
     endpoints: (builder) => ({
@@ -11,25 +13,25 @@ const authSlice = createApi({
                 url:'sign-in',
                 method:'POST',
                 body:{
-                    ...userInfo
+                    user:encryptResponse(userInfo)
                 }
             }),
         }),
         logIn: builder.mutation({
-            query: phoneNumber => ({
+            query: email => ({
                 url:'log-in',
                 method:"POST",
                 body:{
-                    phoneNumber
+                    email:encryptResponse(email)
                 }
             }),
         }),
         sendOtp:builder.mutation({
-            query: phoneNumber => ({
+            query: (email:any) => ({
                 url:"send-otp-code",
                 method:"POST",
                 body:{
-                    phoneNumber
+                    email:encryptResponse(email)
                 }
             }),
         }),

@@ -30,7 +30,7 @@ const MyCommands:React.FC = () => {
                 </IonToolbar>
             </IonHeader>
             <IonContent>
-                <RadioButton option1='Pending' option2='Completed' setHome={setCurrentTab} />
+                <RadioButton option1='Pending' option2='Ongoing' setHome={setCurrentTab} />
                 {currentTab === 'Pending'?<PendingCommands />:<CompletedCommands />}
             </IonContent>
         </IonPage>

@@ -1,0 +1,37 @@
+.pending-item{
+    margin-bottom:0.5rem;
+
+    .accordion-body{
+        display:flex;
+        flex-direction:column;
+        align-content: center;
+    
+        .accordion-footer{
+            display:flex;
+            justify-content: space-evenly;
+            align-items: center;
+            background:#d2e0f8;
+            border-radius:15px;
+            flex-direction: column;
+            width:90%;
+            align-self: center;
+            padding:0.5rem 0;
+        }
+    }
+}
+
+table{
+    margin:0.8rem auto;
+    background:#d2e0f8;
+    padding:0;
+    width:90%;
+    border-radius:15px;
+
+    th{
+        font-weight: 600;
+    }
+
+    tr{
+        text-align: center;
+    }
+}

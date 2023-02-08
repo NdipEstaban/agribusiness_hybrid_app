@@ -2,29 +2,143 @@
     height:4rem !important;
 }
 
+.profile-page-account-card{
+    margin-top:1rem;
+}
+
+.user-profile-page{
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    height:100%;
+    width:100%;
+    margin-bottom:0.5rem;
+}
+
+
+.orders-section{
+    align-self: center;
+    width:24rem;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow:  5px 5px 10px #d9d9d9,
+                -5px -5px 10px #ffffff;
+    color:#282828;
+    font-family: 1.2rem;
+    padding:1rem;
+
+    display:flex;
+    flex-direction: column;
+    margin-top:0.5rem;
+
+    h4{
+        margin-left:0.5rem;
+        font-size:1.3rem;
+    }
+
+    .orders-section-number{
+        color:rgb(60, 122, 255);
+        align-items: center;
+        justify-content: center;
+        gap:0.3rem;
+
+        span{
+            font-size:1.5rem;
+        }
+    }
+}
+
+.user_products_list{
+    margin-top:0.5rem;
+    display:flex;
+    flex-direction: column;
+    justify-content: start;
+    width:24rem;
+
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow:  5px 5px 10px #d9d9d9,
+                -5px -5px 10px #ffffff;
+
+    .user_profile-title{
+        font-weight:600;
+        font-size:1.3rem;
+        margin-left:1rem;
+    }
+}
+
 .user__profile__specs-list{
     height:24rem;
     display:flex;
     flex-wrap:wrap;
     overflow:auto;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items:flex-start;
     margin-top:1rem;
+    border-radius:15px;
+    width:100%;
+    gap:1rem;
 }
 
-.user_profile-title{
-    font-weight:bold;
-    font-size:1.5rem;
-    margin:2rem 0 0.5rem  0.5rem !important;
-}
 
-.send-message{
-    margin-top:2rem;
-    height:3rem;
-    font-size:1.2rem;
-    width:90%;
 
-    position:relative;
-    left: 50%;
-    transform:translateX(-50%)
+@media screen and (min-width:770px){
+    .user-profile-page{
+        display:grid;
+        grid-template:60% 40%/50% 50%;
+        
+        position:absolute;
+        top:40%;
+        left:50%;
+        transform:translate(-50%, -50%);
+        width:75rem;
+        height:50rem;
+        margin-top:4rem;
+        gap:1rem;
+    }
+
+    .profile-page-account-card{
+        height:100%;
+        width:100%;
+        grid-row:1;
+        grid-column:1;
+        justify-self: center;
+    }
+
+    .orders-section{
+        grid-column: 1;
+        grid-row:2;
+        justify-self: center;
+        width:100%;
+        height:100%;
+        margin-bottom:2rem;
+
+        h4{
+            font-size:2rem;
+        }
+
+        .orders-section-number{
+            color:rgb(60, 122, 255);
+            align-items: center;
+            justify-content: center;
+            gap:1rem;
+            font-size:1.5rem;
+    
+            span{
+                font-size:3rem;
+            }
+        }
+    }
+
+    .user_products_list{
+        height:96%;
+        width:100%;
+        grid-row:1/3;
+        grid-column:2;
+        justify-self: center;
+
+        .user_profile-title{
+            font-size:2rem
+        }
+    }
 }

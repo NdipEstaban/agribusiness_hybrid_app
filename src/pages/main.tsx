@@ -48,8 +48,8 @@ const Main = () => {
           <Route exact path="/main/search">
             <Search />
           </Route>
-          <Route exact path="/main/search/account-details">
-            <UserProfile />
+          <Route exact path="/main/account-details/:id">
+            <UserProfile/>
           </Route>
  
           {/*Defining the messaging tab route and nested routes*/}
@@ -61,10 +61,10 @@ const Main = () => {
           </Route>
 
           <Route path="/main/cart">
-            <MyCommands />
+            <Cart />
           </Route>
-          <Route path="/main/account">
-            <Account />
+          <Route exact path="/main/account/">
+            <Account/>
           </Route>
         </IonRouterOutlet>
         <IonTabBar slot="bottom" id='app-tab-bar'>
@@ -78,7 +78,7 @@ const Main = () => {
           </IonTabButton>
           <IonTabButton tab="messaging" href="/main/messaging">
             <IonIcon icon={chatbox} />
-            <IonLabel>Messaging</IonLabel>
+            <IonLabel>Chats</IonLabel>
           </IonTabButton>
           <IonTabButton tab="cart" href="/main/cart">
             <IonIcon icon={cart} />
@@ -86,7 +86,7 @@ const Main = () => {
           </IonTabButton>
           <IonTabButton tab="account" href="/main/account">
             <IonIcon icon={person}/>
-            <IonLabel>Account</IonLabel>
+            <IonLabel>My account</IonLabel>
           </IonTabButton>
         </IonTabBar>
       </IonTabs>

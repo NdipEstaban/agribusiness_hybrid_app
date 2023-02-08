@@ -1,13 +1,8 @@
 .cart__item{
-    min-width:115%;
+    display:flex;
+    justify-content: space-between;
+    width:100%;
 
-    .cart__item-image{
-        border:1px solid black;
-        height:3.5rem;
-        width:5.5rem;
-        margin-left:2rem;
-        border-radius:20px;
-    }
 
     .cart__item-details{
         margin-right:2.5rem;
@@ -16,6 +11,7 @@
         flex-direction:column;
         justify-content: space-evenly;
         align-items:left;
+        width:100%;
 
         .cart__item-details-name{
             font-weight:bold;
@@ -27,6 +23,7 @@
     }
 
     .cart__item-quantity{
+        width:100%;
         margin-left:15px;
         display:flex;
         flex-direction:row;

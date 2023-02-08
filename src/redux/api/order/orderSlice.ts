@@ -1,22 +1,22 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+import { idCardSharp } from 'ionicons/icons';
 
 const orderSlice = createApi({
-    reducerPath:"Order",
+    reducerPath:"orderApi",
     baseQuery:fetchBaseQuery({baseUrl:"http://localhost:7000/orders"}),
     tagTypes:['Order'],
     endpoints:(builder) => ({
         getConsumerOrders:builder.query({
-            query:() => `get-consumer-orders`,
+            query:(id:string) => `get-consumer-orders?consumerId=${id}`,
         }),
         getMerchantOrders:builder.query({
-            query:() => 'get-merchant-orders'
+            query:(id:string) => `get-merchant-orders?merchantId=${id}`
         }),
         getDeliveryOrders:builder.query({
-            query:() => 'get-delivery-orders'
+            query:(id:string) => `get-delivery-orders?deliveryId=${id}`
         }),
-        
         confirmDelivery:builder.query({
-            query:(id) => `consumer-confirm-delivery?${id}`
+            query:(id:string) => `consumer-confirm-delivery?${id}`
         }),
         createOrder: builder.mutation({
             query:(info) => ({
@@ -49,9 +49,7 @@ const orderSlice = createApi({
             query:(info) => ({
                 url:"cancel-order",
                 method:"POST",
-                body:{
-                    ...info
-                }
+                body:info
             })
         })
     })
@@ -59,6 +57,9 @@ const orderSlice = createApi({
 
 
 export const {
+    useLazyGetConsumerOrdersQuery,
+    useLazyGetDeliveryOrdersQuery,
+    useLazyGetMerchantOrdersQuery,
     useGetConsumerOrdersQuery,
     useGetDeliveryOrdersQuery,
     useGetMerchantOrdersQuery,

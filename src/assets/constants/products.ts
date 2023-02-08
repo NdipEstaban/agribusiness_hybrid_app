@@ -4,7 +4,6 @@ const PRODUCTS = [
     "oranges",
     "watermelon",
     "pear",
-    "banana",
     "pineaple",
     "lemon",
     "lime",
@@ -22,7 +21,6 @@ const PRODUCTS = [
     "cocoyams",
     "cocoa",
     "potatoes",
-    "ginger",
     "coffee",
     "pawpaw"
 ]

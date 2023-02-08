@@ -1,20 +1,22 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { useRef } from 'react';
-import { useIonActionSheet, IonContent,IonText, IonModal,IonCard, IonCardTitle, IonCardSubtitle, IonHeader, IonImg, IonItem, IonTitle, IonButton } from '@ionic/react';
+import { useIonActionSheet, IonContent,IonText, IonModal,IonCard, IonCardTitle, IonCardSubtitle, IonHeader, IonImg, IonItem, IonTitle, IonButton, IonToolbar, IonButtons, useIonViewWillEnter, useIonViewDidEnter } from '@ionic/react';
 
 import {IonRouterOutlet} from "@ionic/react";
 import {Route, useHistory} from 'react-router-dom';
 
-import {faTrash, faCartShopping} from '@fortawesome/free-solid-svg-icons';
+import {faTrash, faCartShopping, faArrowLeftLong} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import img from '../../../../assets/images/abic_logo.png';
+import profileimg from '../../../../assets/images/delivery_man.jpg';
 import tomatoes from '../../../../assets/images/tomatoes.png';
 import './product_card.scss';
 import { useAppSelector } from '../../../../hooks/redux_hooks';
-import { useGetUserByIdQuery } from '../../../../redux/api/user/userSlice';
-
-
+import { useGetUserByIdMutation} from '../../../../redux/api/user/userSlice';
+import { useStorage } from '../../../../hooks/useStorage';
+import { useDeleteProductMutation } from '../../../../redux/api/product/productSlice';
+import { useAppDispatch} from '../../../../hooks/redux_hooks';
+import { updatePendingOrders } from '../../../../redux/features/cart/cartSlice';
 
 interface ProductCardProps{
     name:string,
@@ -23,38 +25,62 @@ interface ProductCardProps{
     merchantId:string,
     image:string,
     tab:string,
-
+    productId:string,
     cardAction?:(param:string) => void
 }
 
 
-const ProductCard:React.FC<ProductCardProps> = ({price, name, description, merchantId, image, tab}):JSX.Element => {
-
-    const userRole = useAppSelector(state => state.user.role);
-    const {data:merchant} = useGetUserByIdQuery(merchantId);
-
+const ProductCard:React.FC<ProductCardProps> = ({price, name, description, merchantId, image, tab, productId}):JSX.Element => {
+    const dispatch = useAppDispatch();
+    const {addPendingOrder, pendingOrders} = useStorage();
+    const userRole = useAppSelector((state:any) => state.user.role);
+    const [deleteProduct] = useDeleteProductMutation();
     const productModal = useRef<HTMLIonModalElement>(null);
-
     const [present] = useIonActionSheet();
+    const [isOpen, setIsOpen] = useState(false);
     const history = useHistory();
+    const [getMerchant, {data:merchant}] = useGetUserByIdMutation();
+    
 
     const closeModal = () => {
-        productModal.current?.dismiss();
+        setIsOpen(false);
     }
 
     const goToAuthorProfile = () => {
-        history.push("/main/search/account-details", {from:'/main/search'});
+        closeModal();
+        history.push(`/main/account-details/${merchantId}`, {from:window.location.pathname});
     }
 
-    //In order to solve the modal problem, attribute each card a unique id along with the trigger of the modal
+    const handleDeleteProduct = () => {
+        deleteProduct(productId);
+    }
+
+    const handleAddtoCart = async() => {
+        getMerchant(merchantId).unwrap()
+        .then((data) => {
+            let order:{merchantId:string, merchantName:string, productId:string, productName:string, unitPrice:string, merchantPhoto:string} = {
+                merchantId,
+                merchantName:data?.name,
+                productId,
+                unitPrice:price,
+                merchantPhoto:data?.profile_picture,
+                productName:name
+            }
+            addPendingOrder(order)
+        });
+    }
+
+    useEffect(() => {
+        dispatch(updatePendingOrders(pendingOrders));
+    }, [pendingOrders])
 
     return(
-        <div className='card'>
-            <IonImg id='card' src={image} /> 
-            <div id='details'>
-                <div id='name-price'>
-                    <IonText id='name'>{name}</IonText>
-                    <IonText id='price'>{price}/kg</IonText>
+        <div className='product__card' onClick={() => getMerchant(merchantId)}>
+            <img className='product__card-image' id={productId} src={image} alt="product" onClick={() => setIsOpen(true)}/> 
+            <div className='details'>
+                <div className='name-price'>
+                    <p className='name'>{name}</p>
+                    <p className='price'>{price}CFA/kg</p>
                 </div>
                     {
                     /*Only the producer can delete products he added from his account*/
@@ -62,7 +88,7 @@ const ProductCard:React.FC<ProductCardProps> = ({price, name, description, merch
                     /*The livreur can't do anything to the products*/
                     }
                     {(userRole === 'merchant' && tab === 'myproduct')?
-                    <IonButton color='white' fill='clear' onClick={
+                    <button className='product__card-btn' onClick={
                         () => {
                             present({
                                 header:'Are you sure you want to delete this item?',
@@ -70,7 +96,8 @@ const ProductCard:React.FC<ProductCardProps> = ({price, name, description, merch
                                 buttons:[
                                     {
                                         text: 'Yes',
-                                        role: 'confirm'
+                                        role: 'confirm',
+                                        handler:() => handleDeleteProduct()
                                     },
                                     {
                                         text:'No',
@@ -83,50 +110,60 @@ const ProductCard:React.FC<ProductCardProps> = ({price, name, description, merch
                         }
                     }>
                         <FontAwesomeIcon icon={faTrash} />
-                    </IonButton>
+                    </button>
                     :(userRole === "consumer"?
-                    <IonButton color='white' fill='clear'>
-                        <FontAwesomeIcon icon={faTrash} />
-                    </IonButton>
+                    <button className='product__card-btn' onClick={() => handleAddtoCart()}>
+                        <FontAwesomeIcon icon={faCartShopping}/>
+                    </button>
                         :
                         ''
                     )
                     }
 
-                <IonModal id="product-card-modal" ref={productModal} trigger='card'>
-                    <div className="product__card-modal-body">
-                        
-                        <div className='modal__header'>
-                            <div className='modal__header-images'>
-                                <IonImg className='modal__header-author-img' src={merchant?.profile_picture} onClick={goToAuthorProfile}/>
-                                <IonImg className='modal__header-product-img' src={image} />
-                            </div>
-                            <div className='modal__header-props'>
-                                <div className='modal__header-props-text'>
-                                    <IonText className='modal__header-name'>Tomatoes</IonText>
-                                    <IonText className='modal__header-price'>8000F/kg</IonText>
-                                </div>
-                                <IonButton color="primary" shape='round' className='modal__header-add-to-cart'>
-                                    <FontAwesomeIcon icon={faCartShopping} />
-                                </IonButton>
-                            </div>
-                        </div>
-                        <div className='modal__content'>
-                            <IonText className='modal__content-description'>
-                                lorem ipsum dolor res sure
-                                lore id d j jdljldjklj kddd 
-                                dddd ddjdkd dkjkdd dkdjd d kdk
-                                dkjdkj dkdjd dkjdd djkdj dkdjd
-                                d kjdkdj dkjdkjd djdjkj kdjdjd
-                                djkdjdkjd kdjdjd kjdkjd dkjdkj
-                                djkdkjd dkjdkjd kdjdkjd kjdkdj
-                                jdkjdkjd djkdjd jdkjdd kjdkjd 
-                            </IonText>
-                            <IonButton fill='outline' shape='round' onClick={closeModal}>
-                                Close
+                <IonModal isOpen={isOpen}>
+                    <IonHeader>
+                        <IonToolbar>
+                        <IonTitle>Details</IonTitle>
+                        <IonButtons slot="start">
+                            <IonButton onClick={() => closeModal()} className='back-button'>
+                                <FontAwesomeIcon icon={faArrowLeftLong}/>
                             </IonButton>
-                        </div>
-                    </div>
+                        </IonButtons>
+                        </IonToolbar>
+                    </IonHeader>
+                    <IonContent>
+                        <div className="product__card-details">
+                            <img className='product-image' alt='product' src={image} />
+                            <section className='product__card-body'>
+                                <div className='merchant-details'>
+                                    <h3>Provided by</h3>
+                                    <section>
+                                        <img src={merchant?.profile_picture} className='merchant-image' alt='merchant' />
+                                        <p className='merchant-name' onClick={() => goToAuthorProfile()}>{merchant?.name}</p>
+                                    </section> 
+                                </div>
+                                <div className='product-description'>
+                                    <h3>Description</h3>
+                                    <p className='product-description'>
+                                       {description}
+                                    </p>
+                                </div>
+                                <div className='product-details'>
+                                    <span>
+                                        <p className='product-name'>{name}</p>
+                                        <p className='product-price'>{price}CFA/Kg</p>
+                                    </span>
+                                    {
+                                        userRole === 'consumer' &&
+                                        <button className='cart-btn'>
+                                            Add to Cart
+                                        </button>
+                                    }
+                                    
+                                </div>
+                            </section>
+                        </div> 
+                    </IonContent>
                 </IonModal>
 
             </div>

@@ -1,34 +1,51 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+import { encryptResponse } from '../../../utils/crypto_utility';
 
 const productSlice = createApi({
-    reducerPath:"Product",
+    reducerPath:"productApi",
     baseQuery:fetchBaseQuery({baseUrl:"http://localhost:7000/products"}),
-    tagTypes:['Product'],
+    tagTypes:['Product', 'MerchantProducts'],
     endpoints:(builder) => ({
         searchProduct:builder.query({
             query:(product) => `search-product?search=${product}`
         }),
-        getConsumerProducts:builder.query({
-            query:() => 'get-consumer-products'
+        getProductsInteractedWith:builder.query({
+            query:(user:{userId:string,role:string}) => `get-products?user=${user}`
         }),
-        getProducts:builder.query({
-            query:() => 'get-products'
+        getConsumerProducts:builder.mutation({
+            query:(page) => ({
+                url:`get-consumer-products?page=${page}`,
+                method:"GET"
+            }),
+            invalidatesTags:['Product']
+        }),
+        getProducts:builder.mutation({
+            query:(page) => ({
+                url:`get-products?page=${page}`,
+                method:"GET"
+            }),
+            invalidatesTags:['Product']
+        }),
+        getMerchantProducts:builder.query({
+            query:(merchantId) => `get-merchant-products?merchantId=${merchantId}`,
+            providesTags:['MerchantProducts', 'Product']
         }),
         createNewProduct:builder.mutation({
-            query:(info) => ({
+            query:(prod) => ({
                 url:"new-product",
                 method:"POST",
                 body:{
-                    ...info
+                    product:encryptResponse(prod)
                 }
             }),
+            invalidatesTags:['MerchantProducts']
         }),
         updateProduct: builder.mutation({
             query:(info) => ({
                 url:"update-product",
                 method:"PUT",
                 body:{
-                    ...info
+                    info
                 }
             }),
         }),
@@ -37,9 +54,10 @@ const productSlice = createApi({
                 url:"delete-product",
                 method:"DELETE",
                 body:{
-                    ...info
+                    id:encryptResponse(info)
                 }
             }),
+            invalidatesTags:['MerchantProducts']
         })
     })
 });
@@ -47,11 +65,14 @@ const productSlice = createApi({
 
 export const {
     useSearchProductQuery,
+    useLazySearchProductQuery,
     useCreateNewProductMutation,
-    useGetConsumerProductsQuery,
-    useGetProductsQuery,
+    useGetProductsMutation,
+    useGetConsumerProductsMutation,
     useUpdateProductMutation,
-    useDeleteProductMutation
+    useDeleteProductMutation,
+    useGetMerchantProductsQuery,
+
 } = productSlice;
 
 export default productSlice;

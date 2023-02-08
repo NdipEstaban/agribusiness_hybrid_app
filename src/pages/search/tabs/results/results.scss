@@ -7,8 +7,39 @@
     }
 
     .results__list{
+        width:100%;
         display:flex;
         flex-direction:row;
         align-items: center;
+        justify-content: center;
+        gap:0.7rem;
+        margin-top:0.5rem;
+        flex-wrap: wrap;
+    }
+}
+
+@media screen and (min-width:768px){
+    .search__results{
+        display: flex;
+        flex-direction:row;
+        gap:1rem;
+    
+        .search__results-radio{
+            display:none !important;
+        }
+    
+        .results__list{
+            display:flex !important;
+            flex-direction:row;
+            align-items: flex-start;
+            justify-content: start;
+            gap:1rem;
+            padding:1rem;
+            padding-bottom:1rem;
+            margin-top:0.5rem;
+            flex-wrap: wrap;
+            max-height:90vh;
+            overflow-y: scroll;
+        }
     }
 }

@@ -1,16 +1,21 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 
 const announceSlice = createApi({
-    reducerPath:"Announce",
+    reducerPath:"announceApi",
     tagTypes:["Announce"],
     baseQuery:fetchBaseQuery({baseUrl:"http://localhost:7000/announcements"}),
     endpoints:(builder) => ({
-        getOrders:builder.query({
-            query:() => 'get-announce',
+        getAnnouncements:builder.mutation({
+            query:(page) => ({
+                url:`get-announce?page=${page}`,
+                method:"GET"
+            }),
         }),
     })
 });
 
-export const {useGetOrdersQuery} = announceSlice;
+export const {
+    useGetAnnouncementsMutation
+} = announceSlice;
 
 export default announceSlice;

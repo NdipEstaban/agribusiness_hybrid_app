@@ -1,15 +1,26 @@
 import React from 'react';
 import {useState} from 'react';
-import {IonItem, IonImg, IonText, IonButton} from '@ionic/react';
+import {IonItem, IonImg, IonText, IonButton, IonAvatar, IonAccordion, IonAccordionGroup} from '@ionic/react';
 
-import'./cart_item.scss';
+import'./product_item.scss';
 
 import  img from  '../../../../assets/images/abic_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faPlus, faAdd, faMinus} from '@fortawesome/free-solid-svg-icons';
+import { useStorage } from '../../../../hooks/useStorage';
 
-const CartItem:React.FC = () => {
-    const [quantity, setQuantity] = useState('01');
+interface ProductCartItemProps{
+    id:string,
+    name:string,
+    prodQuantity:string,
+    price:string,
+    merchantId:string
+}
+
+const ProductCartItem:React.FC<ProductCartItemProps> = ({merchantId, id, name, prodQuantity, price}):JSX.Element => {
+    const [quantity, setQuantity] = useState(prodQuantity);
+
+    const {updatePendingOrdersProduct} = useStorage();
 
     const addQuantity = (current:string = quantity) => {
         let newQuantity = Number(current)  + 1;
@@ -19,6 +30,8 @@ const CartItem:React.FC = () => {
             current = current.padStart(2, '0');
         }
         setQuantity(current);
+
+        updatePendingOrdersProduct({productId:id, quantity:current, merchantId});
     }
 
     const reduceQuantity = (current:string = quantity) => {
@@ -33,16 +46,13 @@ const CartItem:React.FC = () => {
     }
 
     return(
-        <IonItem lines='none' className='cart__item'>
-            <div className='cart__item-image'>
-                <IonImg src={img} />
-            </div>
+        <IonItem lines='none' className='cart__item' color={"none"}>
             <div className='cart__item-details'>
-                <IonText className='cart__item-details-name'>Orange</IonText>
-                <IonText className='cart__item-details-price'>14,000/kg</IonText>
+                <IonText className='cart__item-details-name'>{name}</IonText>
+                <IonText className='cart__item-details-price'>{price}/kg</IonText>
             </div>
             <div className='cart__item-quantity'>
-                <IonButton fill='clear' onClick={() => reduceQuantity()}>
+                <IonButton slot='end' fill='clear' onClick={() => reduceQuantity()}>
                     <FontAwesomeIcon icon={faMinus} />
                 </IonButton>
                 <IonText>
@@ -56,4 +66,8 @@ const CartItem:React.FC = () => {
     );
 }
 
-export default CartItem;
+export default ProductCartItem;
+
+
+
+

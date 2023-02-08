@@ -1,26 +1,30 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import userSlice from "./api/user/userSlice";
 import orderSlice from "./api/order/orderSlice";
 import productSlice from "./api/product/productSlice";
 import announceSlice from "./api/announcement/announceSlice";
 import authSlice from "./api/auth/authSlice";
 import user from "./features/user/userSlice";
-
+import searchSlice from "./features/search/searchSlice";
+import cartSlice from "./features/cart/cartSlice";
 
 const store = configureStore({
     reducer:{
         user:user,
+        search:searchSlice,
+        cart:cartSlice,
         [orderSlice.reducerPath]:orderSlice.reducer,
-        [userSlice.reducerPath]:orderSlice.reducer,
-        [productSlice.reducerPath]:orderSlice.reducer,
+        [userSlice.reducerPath]:userSlice.reducer,
+        [productSlice.reducerPath]:productSlice.reducer,
         [authSlice.reducerPath]:authSlice.reducer,
         [announceSlice.reducerPath]:announceSlice.reducer
     },
-    // middleware:[orderSlice.middleware, announceSlice.middleware,authSlice.middleware, userSlice.middleware, productSlice.middleware]
-    middleware:(getDefaultMiddleware) => getDefaultMiddleware().concat(
-        orderSlice.middleware, 
+    middleware:(getDefaultMiddleware) => getDefaultMiddleware({serializableCheck:false}).concat(
+        orderSlice.middleware,
         announceSlice.middleware,
-        authSlice.middleware
+        authSlice.middleware,
+        productSlice.middleware,
+        userSlice.middleware
     )
 });
 

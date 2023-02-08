@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import {IonList, IonModal, useIonModal} from '@ionic/react';
+import {IonAccordionGroup, IonList, IonModal, useIonModal} from '@ionic/react';
 
 import './pending_commands.scss';
 
@@ -10,9 +10,11 @@ const PendingCommands:React.FC = () => {
 
     return(
         <IonList lines='none'>
-            <PendingItem />
-            <PendingItem />
-            <PendingItem />
+            <IonAccordionGroup>
+                <PendingItem />
+                <PendingItem />
+                <PendingItem />
+            </IonAccordionGroup>
         </IonList>
 
 

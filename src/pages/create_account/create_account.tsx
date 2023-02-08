@@ -1,4 +1,4 @@
-import {IonButton, IonTitle, IonContent, IonGrid, IonHeader, IonImg, IonInput, IonItem, IonLabel, IonList, IonPage, IonRow, IonSelect, IonSelectOption} from '@ionic/react';
+import {IonButton, IonTitle, IonContent, IonGrid, IonHeader, IonImg, IonInput, IonItem, IonLabel, IonList, IonPage, IonRow, IonSelect, IonSelectOption, useIonLoading} from '@ionic/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
 import './create_account.scss';
@@ -13,10 +13,14 @@ import { setFlagsFromString } from 'v8';
 import { logIn, send } from 'ionicons/icons';
 import { useHistory } from 'react-router';
 import { updateUser } from '../../redux/features/user/userSlice';
+import { decryptRequest } from '../../utils/crypto_utility';
+import { useIonAlert } from '@ionic/react';
+import { User, useStorage } from '../../hooks/useStorage';
 
 
 let nameRegex = /^[a-zA-Z]{2,}\s[a-zA-Z]{2,}/;
-let phoneRegex = /^6[0-9]{8}$/g;
+let emailRegex = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+let quaterRegex = /^[a-zA-Z]{3,}|[0-9a-zA-Z]{3,}\s[a-zA-Z0-9]{2,} | [0-9a-zA-Z]{3,}/i;
 
 const inputHandler = (e:React.ChangeEvent<HTMLInputElement>,regex:RegExp, setValue:Function, inputRef:RefObject<HTMLInputElement>):void => {
     let inputValue = e.target.value;
@@ -32,7 +36,7 @@ const inputHandler = (e:React.ChangeEvent<HTMLInputElement>,regex:RegExp, setVal
 type SignInLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 /*sign-in levels
--> 1: contact
+-> 1: email
 -> 2: verification code
 -> 3: name
 -> 4:selection of profile picture
@@ -43,9 +47,12 @@ type SignInLevel = 1 | 2 | 3 | 4 | 5 | 6;
 export const CreateAccount:React.FC = () => {
     const dispatch = useAppDispatch();
     const history = useHistory();
+    const [presentAlert] = useIonAlert();
+    const [presentLoader, dismissLoader] = useIonLoading();
+    const {saveUserDetails, markAuthed} = useStorage();
 
-    const [signIn] = useSignInMutation();
-    const [sendOtp, {data:otp}] = useSendOtpMutation();
+    const [signIn, {isLoading:signInLoading, isError:signInError, isSuccess:signInSuccess}] = useSignInMutation();
+    const [sendOtp, {data:otp, isLoading, isSuccess:otpSuccess}] = useSendOtpMutation();
     const [logIn, {}] = useLogInMutation();
     const [updateConsumer] = useUpdateConsumerMutation();
     const [updateMerchant] = useUpdateMerchantMutation();
@@ -55,20 +62,21 @@ export const CreateAccount:React.FC = () => {
 
     //Refs to toggle the forms border color depending on the validity of data
     const nameRef = useRef<HTMLInputElement>(null);
-    const phoneRef = useRef<HTMLInputElement>(null);
+    const emailRef = useRef<HTMLInputElement>(null);
     const verifCodeRef = useRef<HTMLInputElement>(null);
-
+    const quaterRef = useRef<HTMLInputElement>(null);
 
     /*Local state to hold the values entered by the user, each is an array containing the
     the user at index 0 and whether it's valid using a boolean at index 1*/
     
     const [name, setName] = useState<Array<any>>([]);
-    const [phoneNumber, setPhoneNumber] = useState<Array<any>>([]);
+    const [email, setEmail] = useState<Array<any>>([]);
     const [role, setRole] = useState<string>('');
     const [city, setCity] = useState<string>('');
+    const [quater, setQuater] = useState<Array<any>>([]);
     const [photo, setPhoto] = useState<string | undefined>('');
     const [userPref, setUserPref] = useState<Array<string>>([]);
-    const [newUser, setNewUser] = useState<boolean>(false);
+    const [userExist, setUserExist] = useState<boolean>(false);
 
     const [verifCode, setVerifCode] = useState<Array<any>>([]);
 
@@ -77,7 +85,7 @@ export const CreateAccount:React.FC = () => {
         switch(signInLevel){
             case 1:
                 getVerificationCode();
-                if(phoneNumber[1] === true) setSignInLevel(2);
+                if(email[1] === true) setSignInLevel(1);
                 break;
             case 3:
                 if(name[1] === true && city !== '' ) setSignInLevel(4);
@@ -110,24 +118,69 @@ export const CreateAccount:React.FC = () => {
 
     //fetch verification code, if number already exist in db, login into app else go through account creation
     const getVerificationCode = () => {
-        let number = String(phoneNumber[0]);
-        sendOtp(number).then((result:any) => {
-            console.log(result?.data?.otpCode);
-            if(result?.data?.numberExist){
-                logIn(number).then( info => {
-                    dispatch(updateUser(info));
-                });
-            }
-        });
+        let emailAd = String(email[0]);
+
+        if(email[1] === true){
+            sendOtp(emailAd).then((result:any) => {
+                const response = decryptRequest(result?.data);
+                console.log(response);
+    
+                if(response.hasOwnProperty("otpCode") === false){
+                    presentAlert({
+                        header: 'Oops, connection issues',
+                        message: 'Could not send verification code please try again',
+                        buttons: ['Try again'],
+                      })
+                }else{
+                    setSignInLevel(2);
+                }
+    
+                if(response?.emailExist === true){
+                    logIn(emailAd).then( (info:any) => {
+                        console.log(info);
+                        let data = decryptRequest(info.data);
+                        dispatch(updateUser(data));
+                        setUserExist(true);
+    
+                        let userDetails:User = {
+                            quater:data.quater,
+                            userId:data.user_id,
+                            email:data.email,
+                            name:data.name,
+                            city:data.city,
+                            profilePicture:data.profile_picture,
+                            role:data.role,
+                            userPref,
+                            description:data.description,
+                            apiKey:data.api_key,
+                            authed:false,
+                        };
+                        
+                        saveUserDetails(userDetails);
+                    });
+                }
+            }).catch(err => {
+                presentAlert({
+                    header: 'Oops, no network connection',
+                    message: 'Please turn on your network connection and try again',
+                    buttons: ['Try again'],
+                })
+            });
+        }
+        
     };
 
     //check verification code, if successful then move on to next level in account creation
     const handleVerificatonCode = (e:any) => {
         let code = e.target.value;
-        if(code === otp.otpCode){
+        let data = decryptRequest(otp);
+        console.log(data)
+        if(code === data.otpCode){
             setVerifCode([verifCode, true]);
-            if(newUser)history.push("/main");
+            //If user already has an account then move to home screen
+            if(userExist)history.push("/main");
             setSignInLevel(3);
+            markAuthed();
         }else{
             setVerifCode([verifCode, false]);
         }
@@ -154,51 +207,96 @@ export const CreateAccount:React.FC = () => {
             id:'',
             name:name[0], 
             profilePhoto:photo, 
-            city, 
+            city,
+            quater:quater[0], 
             role, 
-            phoneNumber:phoneNumber[0], 
-            userPref:(role === 'merchant')?userPref.join(''):userPref
-        }
+            email:email[0], 
+            userPref:(role === 'merchant')?userPref.join(''):userPref,
+            apiKey:""
+        };
 
         signIn(user).then((result:any) => {
-            user.id = result?.data?.id;
-            console.log(result.data);
+            let data = decryptRequest(result?.data);
+            user.id = data?.userId;
+            user.apiKey = data?.apiKey
             dispatch(updateUser(user));
+
+            history.push("/main")
+        }).catch(err => {
+            presentAlert({
+                header: 'Oops, no network connection',
+                message: 'Please turn on your network connection and try again',
+                buttons: ['Try again'],
+            });
         });
+
+        let userDetails:User = {
+            quater:quater[0],
+            userId:user.id,
+            email:email[0],
+            name:name[0],
+            city:city,
+            profilePicture:photo,
+            role:role,
+            userPref,
+            description:null,
+            apiKey:user.apiKey,
+            authed:true,
+        };
+
+        saveUserDetails(userDetails);
     }
 
+    //Display otp loader
+    if(isLoading){
+        presentLoader({
+            message:"Sending verification code",
+            spinner:"circles"
+        })
+    }else{
+        dismissLoader();
+    }
+
+    //Display sign-in loader
+    if(signInLoading){
+        presentLoader({
+            message:"Creating your account",
+            spinner:"circles"
+        })
+    }else{
+        dismissLoader();
+    }
 
     return(
         <IonPage>
             <IonContent>
-               <div className="create__account-form">
-                <IonTitle className='create__account-form-title'>
+               <div className="create__account-form-wrapper">
+                <h3 className='create__account-form-title'>
                     Create your account
-                </IonTitle>
-                <form>
-                   
+                </h3>
+                <form className='create__account-form'>
+
                     {(signInLevel === 1) && 
                     <React.Fragment>
                         <p className='form_message'>
-                            Your phone number will enable others to
-                            contact you and you can equally contact others
+                            Your email address will be used to send you details about your
+                            transactions. Please verify your email
                         </p>
                         <label className='create__account-label'>
-                            Phone Number
+                            Email
                             <input
-                                ref={phoneRef} 
-                                type='string' 
-                                placeholder='enter your phone number' 
-                                value={phoneNumber[0]}
-                                maxLength={9}
+                                ref={emailRef} 
+                                type='email' 
+                                placeholder='myemail@company.com' 
+                                value={email[0]}
                                 onChange={(e) => {
-                                    inputHandler(e, phoneRegex, setPhoneNumber, phoneRef)}
+                                    inputHandler(e, emailRegex, setEmail, emailRef)}
                                 }
                             />
                             {
-                                phoneNumber[1] === false &&
+                                email[1] === false &&
                                 <p className='input-error-message'>
-                                    Oops, invalid number please try again
+                                    Oops, invalid email please try again
                                 </p> 
                             }
                         </label>
@@ -207,10 +305,10 @@ export const CreateAccount:React.FC = () => {
                     {
                         (signInLevel === 2) &&
                         <React.Fragment>
-                            <p className='form_message'>Please enter the verification code sent to you via sms</p>
-                            <div className='verification__code-container'>
+                            <p className='form_message'>Verify your email by entering the code send to your email address</p>
+                            <label className='create__account-label verification-code-label'>
                                 <input type='text' maxLength={6} placeholder="123456" onChange={(e) => handleVerificatonCode(e)}/>
-                            </div>
+                            </label>
                             
                             {verifCode[1] === true && 
                                 <p className='input-error-message'>
@@ -226,7 +324,7 @@ export const CreateAccount:React.FC = () => {
                         <input
                         ref={nameRef} 
                         type='text' 
-                        placeholder='enter your name' 
+                        placeholder='James bond' 
                         onChange={(e) => inputHandler(e, nameRegex, setName, nameRef)} 
                         value={name[0]}
                         required
@@ -238,11 +336,21 @@ export const CreateAccount:React.FC = () => {
                             Ayayay, please enter atleast 2 names
                         </p>}
                     </label>
-                    <label className='selection-label'>
-                        Select your city of residence
-                        <IonSelect value={city} className='selection' interface="popover" placeholder='select your city of residence' onIonChange={(e) => setCity(e.detail.value)}>
+                    <label className='create__account-label selection-label'>
+                        City
+                        <IonSelect value={city} className='selection' interface="popover" placeholder='Douala' onIonChange={(e) => setCity(e.detail.value)}>
                             {cities.map(i => <IonSelectOption key={i} value={i}>{i}</IonSelectOption>)}
                         </IonSelect>
+                    </label>
+                    <label className='create__account-label'>
+                        Quater
+                        <input ref={quaterRef} type='text' placeholder='Makepe, carrefour petit pays' onChange={(e) => inputHandler(e,quaterRegex, setQuater, quaterRef)}/>
+                        {
+                            (quater[1] === false) &&
+                            <p className='input-error-message'>
+                                please enter a precise area in {city}
+                            </p>
+                        } 
                     </label>
                     </React.Fragment>
                     }
@@ -257,9 +365,8 @@ export const CreateAccount:React.FC = () => {
                                         :
                                         <img src={photo} className='picture' alt="user's profile" />
                                     }
-                                    
                                 </div>
-                                <h3 onClick={() => {handlePhoto()}}>Add a profile picture</h3>
+                                <h6 className='camera-btn' onClick={() => {handlePhoto()}}>Add a profile picture</h6>
                             </div>
                         </React.Fragment>
                     }
@@ -267,7 +374,7 @@ export const CreateAccount:React.FC = () => {
                         (signInLevel === 5) && 
                         <React.Fragment>
                             <div className='proffession-container'>
-                                <h3>What will you be doing?</h3>
+                                {/* <h3>What will you be doing?</h3> */}
                                 <button className='prof-card trader' onClick={() => setRole('merchant')} type="button">
                                     <h6>Merchant</h6>
                                     <p>
@@ -295,25 +402,35 @@ export const CreateAccount:React.FC = () => {
                         (signInLevel === 6) && 
                         <React.Fragment>
                             {(role === 'delivery')?
-                                <label className='selection-label'>
-                                    <IonSelect className='selection' interface="popover" placeholder="Select your destinations" multiple={true} onIonChange={(e) => handleUserPref(e)}>
-                                        {cities.map(i => <IonSelectOption key={i} value={i}>{i}</IonSelectOption>)}
-                                    </IonSelect>
-                                </label>
+                                <React.Fragment>
+                                    <p className='form_message'>
+                                        Select the cities which you deliver products to
+                                    </p>
+                                    <label className='selection-label'>
+                                        <IonSelect className='selection' interface="popover" placeholder="Douala" multiple={true} onIonChange={(e) => handleUserPref(e)}>
+                                            {cities.map(i => <IonSelectOption key={i} value={i}>{i}</IonSelectOption>)}
+                                        </IonSelect>
+                                    </label>
+                                </React.Fragment>
                                 :
-                                <label className='selection-label'>
-                                    <IonSelect className='selection' interface="popover" placeholder="select preffered products" multiple={role === "merchant"?false:true} onIonChange={(e) => handleUserPref(e)}>
+                                <React.Fragment>
+                                    <p className='form_message'>
+                                        Select your most consumed or sold products
+                                    </p>
+                                    <label className='selection-label'>
+                                    <IonSelect className='selection' interface="popover" placeholder="Mango" multiple={role === "merchant"?false:true} onIonChange={(e) => handleUserPref(e)}>
                                         {products.map(i => <IonSelectOption key={i} value={i}>{i}</IonSelectOption>)}
                                     </IonSelect>
-                                </label>}
+                                    </label>
+                                </React.Fragment>
+                                }
                         </React.Fragment>
                     }
                     {signInLevel === 6?
                        <React.Fragment>
                             <IonButton 
-                            routerLink="/main" 
-                            className='create__account-submit-btn' 
-                            expand="full" 
+                            className='create__account-btn create__account-submit-btn' 
+                             
                             shape="round"
                             onClick={() => handleSignIn()}
                             >
@@ -322,7 +439,7 @@ export const CreateAccount:React.FC = () => {
                        </React.Fragment>
                         :
                         <IonButton
-                        className='create__account-submit-btn' 
+                        className='create__account-btn create__account-submit-btn' 
                         expand="full" 
                         shape="round"
                         onClick={() => nextSignInLevel()}
@@ -333,7 +450,7 @@ export const CreateAccount:React.FC = () => {
 
                     {(signInLevel > 3) && 
                         <IonButton
-                        className='create__account-back-btn'
+                        className='create__account-btn create__account-back-btn'
                         color='primary'
                         expand="full"
                         shape="round"

@@ -5,40 +5,62 @@ import './account_card.scss';
 
 import img from '../../assets/images/abic_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLocationDot, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faLocationCrosshairs, faLocationDot, faMapLocation, faMessage, faPen, faPerson, faPersonBooth, faPersonCircleCheck, faPersonCircleXmark } from '@fortawesome/free-solid-svg-icons';
 
 interface AccountCardProps{
-    id?:string,
-    editable?:boolean
+    id?:string;
+    name?:string;
+    description?:string;
+    city?:string;
+    role?:string;
+    image?:string;
+    edit:Boolean;
+    email?:string;
+    quarter?:string;
 }
 
-const AccountCard:React.FC<AccountCardProps> = (props) => {
+const AccountCard:React.FC<AccountCardProps> = (props):JSX.Element => {
     return(
         <div className='account-card'>
-            <div className='img-wrapper'>
-                <IonImg src={img} />
-            </div>
             <div className='user-details'>
-                <IonText className='user-name'>
-                    Pricile Linongue
-                </IonText>
+                <div className='img-wrapper'>
+                    <img className='user-photo' src={props.image} alt='person'/>
+                </div>
+                <div className='user-info'>
+                    <IonText className='user-name'>
+                        {props.name}
+                    </IonText>
+                    <IonText className='user-description'>
+                        A good merchant which sells mainly beans,
+                        groundnuts and all other type of agricultural products...
+                        {props.description}
+                    </IonText>
+                </div>
+                
+            </div>
+            <div className='user-props'>
                 <IonText className='user-occupation'>
-                    Productrice Agroalimentaire
-                </IonText>
-                <IonText className='user-description'>
-                    Vente des produit agroalimentaire
+                    <FontAwesomeIcon icon={faPersonCircleCheck} />
+                    {props.role}
                 </IonText>
                 <IonText className='user-location'>
-                    <FontAwesomeIcon icon={faLocationDot} />
-                    _CM, Douala
+                    <FontAwesomeIcon icon={faMapLocation} />
+                    {props.city}
                 </IonText>
-                <IonText className='phone-number'>
-                    +2376XXXXXXXX
+                <IonText>
+                    <FontAwesomeIcon icon={faMapLocation} />
+                    Cite de palmier carrefour express
+                </IonText>
+                <IonText>
+                    <FontAwesomeIcon icon={faMessage} />
+                    estabannd@gmail.com
                 </IonText>
             </div>
-            <IonFabButton className='edit-button' id={props.id}>
-                <FontAwesomeIcon icon={faPen} />
-            </IonFabButton>
+                {props.edit &&
+                    <IonFabButton className='edit-button' id={props.id}>
+                        <FontAwesomeIcon icon={faPen} />
+                    </IonFabButton>
+                }
         </div>
     );
 }

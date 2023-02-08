@@ -10,6 +10,9 @@
 
     .user__account-photo{
         margin:0.5rem 0;
+        border-radius: 50%;
+        height:4rem;
+        width:4rem;
     }
     
     .user__account-photo::part(image){
@@ -19,5 +22,31 @@
 
     .user__account-name{
         margin-left:1rem;
+    }
+}
+
+@media screen and (min-width:768px){
+    .user__account_item{
+        box-shadow: none;
+        border:0;
+    
+        .input-wrapper{
+            display:flex;
+            width:50%;
+            height:100%;
+        }
+    
+        .user__account-photo{
+            margin:0.5rem 0;
+        }
+        
+        .user__account-photo::part(image){
+            border-radius:20px;
+            height:4rem;
+        }
+    
+        .user__account-name{
+            margin-left:1rem;
+        }
     }
 }

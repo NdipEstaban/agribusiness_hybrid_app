@@ -12,8 +12,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 
 import './account.scss';
+import { RouteComponentProps, useParams } from 'react-router';
 
 const Account:React.FC = () => {
+
+    const params = useParams();
+    console.log(params);
     
     const accountModal = useRef<HTMLIonModalElement>(null);
     const [present] = useIonActionSheet();
@@ -63,7 +67,7 @@ const Account:React.FC = () => {
                 </IonToolbar>
             </IonHeader>
             <IonContent>
-                <AccountCard id='account-card-edit'/>
+                <AccountCard id='account-card-edit' edit={true}/>
                 <IonText>
                     <h1>Last Transactions</h1>
                 </IonText>

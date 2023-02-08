@@ -1,0 +1,61 @@
+.order-status{
+    display:flex;
+    flex-direction: column;
+    width:90%;
+    // border:1px solid #a9a9a9;
+    height:8rem;
+    text-align: center;
+    font-size:1.2rem;
+    font-weight:600;
+    border-radius:20px;
+    background:#d2e0f8;
+    margin-bottom:1rem;
+
+    .order-meter{
+        margin:1rem 0;
+        border-radius:50px;
+        height:1rem;
+        width:100%;
+        display:flex;
+        justify-content: flex-start;
+        background:#a9a9a9;
+        
+        .order-meter-level{
+            justify-self: flex-start;
+            background:#3c7aff;
+            width:00%;
+            margin-left:0;
+            border-radius:50px;
+            color:white;
+        }
+
+        .order-meter-item{
+            position: absolute;
+            height:3rem;
+            width:3rem;
+            border-radius:50%;
+            font-size:1.3rem;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .order-meter-item:nth-child(1){
+            left:5%;
+            transform:translate(0%, -40%);
+            background:#a9a9a9;
+        }
+
+        .order-meter-item:nth-child(2){
+            left:50%;
+            transform: translate(-50%, -40%);
+            background:#a9a9a9;
+        }
+        .order-meter-item:nth-child(3){
+            right:5%;
+            transform:translate(0%, -40%);
+            background:#a9a9a9;
+        }
+    }
+    
+}

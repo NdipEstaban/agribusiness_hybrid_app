@@ -30,11 +30,11 @@ const Notifications:React.FC = () => {
                     <IonButton routerDirection='back' routerLink='/main/home' slot='start' fill='clear'>
                         <FontAwesomeIcon icon={faArrowLeft} />
                     </IonButton>
-                    <IonTitle>Notification</IonTitle>
+                    <IonTitle>Notifications</IonTitle>
                 </IonToolbar>
             </IonHeader>
             <IonContent>
-                <IonList lines='none'>
+                <IonList lines='none' className="notification-list">
                     <NotificationItem />
                     <NotificationItem />
                     <NotificationItem />

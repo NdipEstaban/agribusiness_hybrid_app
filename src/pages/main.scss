@@ -2,6 +2,15 @@
     font-family: 'Segoe UI';
 }
 
+html{
+  font-size:15px;
+}
+
+ion-tab-button{
+  --background-selected:green;
+}
+
+
 .input-error-message{
   text-align:right;
   font-weight:normal;
@@ -40,10 +49,10 @@ ion-item{
 //Designing the modal
 ion-modal#product-card-modal{
     --width: fit-content;
-    --max-width: 20rem;
+    --max-width: 25rem;
     --height: fit-content;
     --border-radius: 20px;
-    --box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+    // --box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
 }
 
 //Customising the action sheet
@@ -75,6 +84,11 @@ ion-action-sheet.my-custom-class .action-sheet-group {
   
   ion-action-sheet.my-custom-class ion-backdrop {
     opacity: 0.6;
+  }
+
+
+  @media screen and (min-width:500px){
+    html{font-size:10px;}
   }
 
 
