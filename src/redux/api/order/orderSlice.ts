@@ -1,5 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import { idCardSharp } from 'ionicons/icons';
+import { decryptRequest, encryptResponse } from '../../../utils/crypto_utility';
 
 const orderSlice = createApi({
     reducerPath:"orderApi",
@@ -8,6 +9,9 @@ const orderSlice = createApi({
     endpoints:(builder) => ({
         getConsumerOrders:builder.query({
             query:(id:string) => `get-consumer-orders?consumerId=${id}`,
+            transformResponse: responseData => {
+                return decryptRequest(responseData);
+            }
         }),
         getMerchantOrders:builder.query({
             query:(id:string) => `get-merchant-orders?merchantId=${id}`

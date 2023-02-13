@@ -1,5 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import { encryptResponse } from '../../../utils/crypto_utility';
+import { decryptRequest, encryptResponse } from '../../../utils/crypto_utility';
 
 const userSlice = createApi({
     reducerPath:"userApi",
@@ -8,6 +8,12 @@ const userSlice = createApi({
     endpoints:(builder) => ({
         searchUser:builder.query({
             query:(user) => `search-users?search=${user}`
+        }),
+        getDeliveryServices: builder.query({
+            query:(query) => `get-delivery?query=${query}`,
+            transformResponse: response => {
+                return decryptRequest(response);
+            }
         }),
         getUserById:builder.mutation({
             query: (userId) => ({
@@ -59,6 +65,7 @@ const userSlice = createApi({
 
 export const {
     useSearchUserQuery,
+    useLazyGetDeliveryServicesQuery,
     useLazySearchUserQuery,
     useGetUserByIdMutation,
     useUpdateUserMutation,

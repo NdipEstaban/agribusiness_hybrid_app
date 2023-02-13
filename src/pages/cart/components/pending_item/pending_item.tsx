@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import {useState} from 'react';
-import {IonItem, IonImg, IonText, IonButton, IonAvatar, IonAccordion, IonAccordionGroup, IonList, IonTitle, useIonAlert, useIonViewWillEnter} from '@ionic/react';
+import {IonItem, IonImg, IonText, IonButton, IonAvatar, IonAccordion, IonAccordionGroup, IonList, IonTitle, useIonAlert, useIonViewWillEnter, useIonLoading} from '@ionic/react';
 import { v4 as uuid } from 'uuid';
 
 import'./pending_item.scss';
@@ -26,25 +26,27 @@ const config = {
     payment_options: 'mobilemoney,ussd',
     customer: {
         email: 'estabannd@gmail.com',
-        phone_number: '070********',
+        phone_number: '',
         name: 'john doe',
     },
     customizations: {
       title: 'my Payment Title',
       description: 'Payment for items in cart',
-      logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
+      logo:"https://sanau-abic.com/assets/img/logo%20ABIC%20SVG%20OK.svg"
+    //   logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
     },
 };
 
 interface pendingCartItem extends pendingOrderItem{
-    deleteItem:(merchantId:string) => void;
+    deleteItem:(merchantId:string) => void,
+    updateItem:(params:any) => Promise<void>,
 }
 
-const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, merchantPhoto, products, date, deleteItem}):JSX.Element => {
-    const {deletePendingOrder} = useStorage();
-    const consumer = useAppSelector(state => state.user)
-    // const makeFlutterWavePayment = useFlutterwave(config);
+const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, merchantPhoto, products, date, deleteItem, updateItem}):JSX.Element => {
+    const consumer = useAppSelector((state:any) => state.user)
+    const makeFlutterWavePayment = useFlutterwave(config);
     const [presentAlert] = useIonAlert();
+    const [presentLoader, dismissLoader] = useIonLoading();
     const [createOrder] = useCreateOrderMutation();
     
     const [total, setTotal] = useState<number>(() => {
@@ -53,14 +55,20 @@ const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, me
             let total = Number(products[i].unitPrice) * Number(products[i].quantity);
             totalAmount += total;
         }
-        // return totalAmount;
-        return 5000
+        return totalAmount;
     });
 
     const handlePayment = () => {
+        presentLoader({
+            message:"Proceeding to payment modal",
+            spinner:"circles"
+        });
         config.amount = total;
         config.customer.name = consumer.name;
         config.customer.email = consumer.email;
+        config.customizations.description = `Deposit for merchant ${merchantName}`;
+        config.customizations.title = "ABIC Agribusiness order"
+        
 
         let order = {
             orderId:uuid(), 
@@ -70,21 +78,47 @@ const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, me
             products
         }
 
-        // makeFlutterWavePayment({
-        //     callback:(response) => {
-        //         console.log(response);
-        //         closePaymentModal();
-        //         console.log('flutterwave');
-        //     },
-        //     onClose:() => {
-        //         createOrder(order);
-        //     }
-        // });
+        makeFlutterWavePayment({
+            callback:(response) => {
+                if(response.status === 'successful'){
+                    createOrder(order)
+                    .then(() => deleteItem(merchantId));
+
+                    presentAlert({
+                        header:"Payment successful",
+                        message:"Your order is on the way, check it's progress from the ongoing tab"
+                    });
+                }else{
+                    presentAlert({
+                        header:"Payment unsuccessful",
+                        message:"An error occured when processing your payment please try again"
+                    });
+                }
+                dismissLoader();
+                closePaymentModal();
+            },
+            onClose:() => {
+                dismissLoader();
+                //TODO:Remove the create order from the onclose callback
+                createOrder(order)
+                    .then(() => deleteItem(merchantId));
+            },
+        });
     }
 
     const handleDeleteOrder = () => {
         deleteItem(merchantId);
+        console.log("order deleted");
     }
+
+    useEffect(() => {
+        let totalAmount = 0;
+        for(let i = 0; i < products.length; i++){
+            let total = Number(products[i].unitPrice) * Number(products[i].quantity);
+            totalAmount += total;
+        }
+        setTotal(totalAmount);
+    }, [updateItem]);
     
     return(
         <IonAccordion value='first' className='pending-item'>
@@ -93,14 +127,24 @@ const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, me
                     <img alt="merchant" src={merchantPhoto} />
                 </IonAvatar>
                 <div>
-                    <IonText>{merchantName}</IonText>
-                    <IonText>{date}</IonText>
+                    <IonText className='merchant-name'>{merchantName}</IonText>
+                    <IonText className='date'>{date}</IonText>
                 </div>
             </IonItem>
             <div slot='content' className='accordion-body'>
                 <IonList className='product-list'>
                     {products.map((prod:{productId:string, name:string, unitPrice:string, quantity?:string}) => {
-                        return(<ProductCartItem key={prod.productId} merchantId={merchantId} id={prod.productId} name={prod.name} price={prod.unitPrice} prodQuantity={prod.quantity || "0"}/>)
+                        return(
+                            <ProductCartItem 
+                                key={prod.productId} 
+                                merchantId={merchantId} 
+                                id={prod.productId} 
+                                name={prod.name} 
+                                price={prod.unitPrice} 
+                                prodQuantity={prod.quantity || "0"}
+                                updateProduct={updateItem}
+                            />
+                        );
                     })}
                 </IonList>
                 <div className='accordion-footer'>
@@ -129,7 +173,9 @@ const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, me
                         PASS ORDER
                     </IonButton>
                     <IonButton 
-                        shape="round" 
+                        shape="round"
+                        fill="clear"
+                        color="white"
                         onClick={() =>
                             presentAlert({
                                 header:"Delete Order?",

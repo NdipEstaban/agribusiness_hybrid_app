@@ -10,60 +10,50 @@ import {faPlus, faAdd, faMinus, faBuilding, faTruck, faHome, faIndustry, faBuild
 import ProductCartItem from '../product_item/product_item';
 import OrderProgress from '../order_progress/order_progress';
 
-const OngoingCartItem:React.FC = () => {
+interface ongoingItemProps{
+    merchantPhoto:string;
+    merchantName:string;
+    date:string;
+    products:{quantity:string, name:string, price:string}[];
+    progress:string;
+    orderId:string;
+    amountPaid:number;
+}
+
+const OngoingCartItem:React.FC<ongoingItemProps> = ({merchantName, merchantPhoto, date, products, progress, orderId, amountPaid}):JSX.Element => {
     
+    const handleCompleteOrder = () => {}//
 
     return(
-        <IonAccordion value='first' className='pending-item'>
+        <IonAccordion value={orderId} className='pending-item'>
             <IonItem slot='header'>
                 <IonAvatar>
-                    <img alt="merchant" src={img} />
+                    <img alt="merchant" src={merchantPhoto} />
                 </IonAvatar>
                 <div>
-                    <IonText>Ndip Estaban</IonText>
-                    <IonText>26/01/2022</IonText>
+                    <IonText className='merchant-name'>{merchantName}</IonText>
+                    <IonText className='date'>{date.slice(0, 10).split("-").reverse().join("/")}     {date.slice(11, 16)}</IonText>
                 </div>
             </IonItem>
             <div slot='content' className='accordion-body'>
-               <OrderProgress />
+               <OrderProgress progress={Number(progress)}/>
                 <table>
-                    <thead>
+                    <tr>
                         <th>Product</th>
                         <th>Quantity(Kg)</th>
                         <th>Price per Kg</th>
-                        {/* <th>Total price</th> */}
-                    </thead>
-                    <tbody>
+                    </tr>
+                    {products.map((product:any) => 
                         <tr>
-                            <td>Inyames</td>
-                            <td>08</td>
-                            <td>14,000</td>
-                            {/* <td>122,0000</td> */}
+                            <td>{product.name}</td>
+                            <td>{product.quantity}</td>
+                            <td>{product.unitPrice}</td>
                         </tr>
-                        <tr>
-                            <td>Banana</td>
-                            <td>08</td>
-                            <td>12,000</td>
-                            {/* <td>100,000</td> */}
-                        </tr>
-                        <tr>
-                            <td>Orange</td>
-                            <td>09</td>
-                            <td>1,000</td>
-                            {/* <td>12,000</td> */}
-                        </tr>
-                        <tr>
-                            <td>Beans</td>
-                            <td>08</td>
-                            <td>13,000</td>
-                            {/* <td>50,000</td> */}
-                        </tr>
-                    </tbody>
-                    
+                    )}
                 </table>
                 <div className='accordion-footer'>
-                    <h4>Total Paid:200000CFA</h4>
-                    <IonButton shape='round'>
+                    <h4>Total Paid:{amountPaid}</h4>
+                    <IonButton shape='round' onClick={() => handleCompleteOrder()}>
                         MARK AS RECIEVED
                     </IonButton>
                 </div>

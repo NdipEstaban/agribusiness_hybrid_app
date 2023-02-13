@@ -24,10 +24,10 @@ export interface User{
 }
 
 export interface pendingOrderItem{
-    merchantId:string;
-    merchantName:string;
-    merchantPhoto:string;
-    date:string;
+    merchantId:string,
+    merchantName:string,
+    merchantPhoto:string,
+    date:string,
     products:{productId:string, name:string, unitPrice:string, quantity:string}[];
 }
 
@@ -92,103 +92,58 @@ export const useStorage = () => {
         currentPendingOrders.map((item:pendingOrderItem) => {
             if(order.merchantId === item.merchantId){
                 merchantOrderExist = true;
-                console.log("merchant does exist");
-            }else console.log("merchant")
+            }
             return item;
         });
 
-
         //if don't have an order with merchant then add new order to top of array
-        
         if(merchantOrderExist === false){
-            console.log("operating on merchant doesn't exist");
             let newOrder:pendingOrderItem = {
                 merchantId:order.merchantId,
                 merchantName:order.merchantName,
                 merchantPhoto:order.merchantPhoto,
                 products:[{productId:order.productId, name:order.productName, unitPrice:order.unitPrice, quantity:"1"}],
                 date:new Date().toLocaleDateString()
-
             }
             //add new order to order list
-            currentPendingOrders.unshift(newOrder);
+            currentPendingOrders = [newOrder, ...currentPendingOrders];
+            console.log("added new order", currentPendingOrders);
+            
         }else{
-            console.log("operating on merchant exist")
             let orderIndex = currentPendingOrders.findIndex(item => order.merchantId === item.merchantId);
+            let currentOrder = currentPendingOrders[orderIndex];
             let productIndex = currentPendingOrders[orderIndex].products.findIndex(prod => prod.productId === order.productId);
+            console.log(currentPendingOrders[orderIndex].products);
+            console.log(productIndex);
             //if product doesn't exist in list of products then add it to the top of list
             if(productIndex === -1){
-                currentPendingOrders[orderIndex].products.unshift({
+                console.log("modified order");
+                console.log("current products");
+                console.log(currentOrder.products);
+                let newProducts = [{
                     productId:order.productId,
                     name:order.productName,
                     unitPrice:order.unitPrice,
                     quantity:"1"
-                });
-            } 
+                }, ...currentOrder.products];
+
+                console.log("new products")
+                console.log(newProducts);
+
+                let updatedOrder:pendingOrderItem = {
+                    merchantId:currentOrder.merchantId,
+                    merchantName:currentOrder.merchantName,
+                    merchantPhoto:currentOrder.merchantPhoto,
+                    products:[...newProducts],
+                    date:new Date().toLocaleDateString()
+                }
+
+                currentPendingOrders.splice(orderIndex, 1, updatedOrder);
+            }
         }
 
         setPendingOrders(currentPendingOrders);
         await store?.set(PENDING_ORDERS_KEY, currentPendingOrders);
-       
-        // let currentPendingOrders = pendingOrders;
-        // let merchantExist:Boolean = false;
-        // console.clear();
-        // console.log(pendingOrders);
-        // console.log(order);
-
-        // //map through the pending orders if an order has already been opened with merchant
-        // currentPendingOrders.map((item:pendingOrderItem) => {
-        //     console.log('order exists')
-        //     if(item.merchantId === order.merchantId){
-        //         merchantExist = true;
-        //         console.log(merchantExist);
-        //         return item;
-        //     }
-        //     return item;
-        // });
-
-
-        // //if order has already been opened then just append new product to list of products
-        // if(merchantExist === true){
-        //     let updatedOrders = currentPendingOrders.map((item:pendingOrderItem) => {
-        //         if(item.merchantId !== order.merchantId){
-        //             //if product already exist then do not add it
-        //             let prodIndex = item.products.findIndex(prod => prod.productId === order.productId);
-        //             if(prodIndex !== -1){
-        //                 let product = {
-        //                     productId:order.productId,
-        //                     name:order.productName,
-        //                     unitPrice:order.unitPrice,
-        //                     quantity:"01"
-        //                 }
-        //                 item.products.unshift(product);
-        //             }
-        //         }
-        //         return item;
-        //     });
-
-        //     currentPendingOrders = [...updatedOrders];
-        // }else{
-        //     let product = {
-        //         productId:order.productId,
-        //         name:order.productName,
-        //         unitPrice:order.unitPrice,
-        //         quantity:"01"
-        //     }
-
-        //     let newPendingOrder:pendingOrderItem = {
-        //         merchantId:order.merchantId,
-        //         merchantName:order.merchantName,
-        //         merchantPhoto:order.merchantPhoto,
-        //         products:[product],
-        //         date:new Date().toLocaleDateString()
-        //     }
-
-        //     currentPendingOrders.unshift(newPendingOrder);
-        // }   
-
-        // setPendingOrders(currentPendingOrders);
-        // await store?.set(PENDING_ORDERS_KEY, currentPendingOrders);
     }
 
     //TODO:impliment update and delete function
@@ -211,6 +166,7 @@ export const useStorage = () => {
         console.log(newPendingOrder);
         setPendingOrders(newPendingOrder);
         await store?.set(PENDING_ORDERS_KEY, newPendingOrder);
+        console.log('pendingorders', newPendingOrder);
     }
 
     const saveFeaturedProducts = async(products:any[], page:number) => {

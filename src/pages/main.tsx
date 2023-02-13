@@ -27,9 +27,10 @@ import UserProfile from './user_profile/user_profile';
 import MyCommands from './my_commands/my_commands';
 
 import './main.scss';
-
+import { useStorage } from '../hooks/useStorage';
 
 const Main = () => {
+    const {pendingOrders, deletePendingOrder, addPendingOrder, updatePendingOrdersProduct} = useStorage();
 
     return (
         <IonReactRouter>
@@ -39,7 +40,7 @@ const Main = () => {
           {/*Defining the home tab route and nested routes */}
 
           <Route exact path="/main/home">
-            <Home />
+            <Home addOrder={addPendingOrder}/>
           </Route>
           <Route exact path="/main/home/notifications">
             <Notifications />
@@ -61,7 +62,8 @@ const Main = () => {
           </Route>
 
           <Route path="/main/cart">
-            <Cart />
+            <MyCommands />
+            {/* <Cart  deleteOrder={deletePendingOrder} updateOrder={updatePendingOrdersProduct} pendingOrders={pendingOrders}/> */}
           </Route>
           <Route exact path="/main/account/">
             <Account/>

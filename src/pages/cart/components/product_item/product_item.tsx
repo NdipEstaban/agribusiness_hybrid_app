@@ -14,13 +14,12 @@ interface ProductCartItemProps{
     name:string,
     prodQuantity:string,
     price:string,
-    merchantId:string
+    merchantId:string,
+    updateProduct:(params:any) => Promise<void>
 }
 
-const ProductCartItem:React.FC<ProductCartItemProps> = ({merchantId, id, name, prodQuantity, price}):JSX.Element => {
+const ProductCartItem:React.FC<ProductCartItemProps> = ({merchantId, id, name, prodQuantity, price, updateProduct}):JSX.Element => {
     const [quantity, setQuantity] = useState(prodQuantity);
-
-    const {updatePendingOrdersProduct} = useStorage();
 
     const addQuantity = (current:string = quantity) => {
         let newQuantity = Number(current)  + 1;
@@ -31,7 +30,7 @@ const ProductCartItem:React.FC<ProductCartItemProps> = ({merchantId, id, name, p
         }
         setQuantity(current);
 
-        updatePendingOrdersProduct({productId:id, quantity:current, merchantId});
+        updateProduct({productId:id, quantity:current, merchantId});
     }
 
     const reduceQuantity = (current:string = quantity) => {
@@ -43,6 +42,8 @@ const ProductCartItem:React.FC<ProductCartItemProps> = ({merchantId, id, name, p
             current = current.padStart(2, '0');
         }
         setQuantity(current);
+
+        updateProduct({productId:id, quantity:current, merchantId});
     }
 
     return(

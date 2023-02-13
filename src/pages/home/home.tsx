@@ -18,8 +18,13 @@ import Notifications from "../notifications/notifications";
 
 import "./home.scss";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux_hooks";
+import { pendingOrderItem } from "../../hooks/useStorage";
 
-const Home:React.FC = () => {
+interface HomeProps{
+    addOrder:(params:any) => Promise<void>;
+}
+
+const Home:React.FC<HomeProps> = ({addOrder}):JSX.Element => {
     const user = useAppSelector(state => state.user);
 
     const [currentHome, setCurrentHome] = React.useState('Featured');
@@ -53,7 +58,7 @@ const Home:React.FC = () => {
                 } */}
                 {
                     <React.Fragment>
-                            <Featured cardAction={setCurrentHome} style={currentHome === "Featured"?{}:{display:"none"}}/>
+                            <Featured cardAction={addOrder} style={currentHome === "Featured"?{}:{display:"none"}}/>
                             <MyProducts style={currentHome === "My products"?{}:{display:"none"}}/>
                     </React.Fragment>  
                 }

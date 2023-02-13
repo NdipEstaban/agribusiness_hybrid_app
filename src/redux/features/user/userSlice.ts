@@ -16,12 +16,12 @@ interface User {
 
 const initialState:User = {
     userId:"46a7ac12-ab22-4803-be9c-5bc9d895cff1",
-    name:"Ndip Estaban",
+    name:"Ndip Estaban Tabe",
     email:"estabannd@gmail.com",
-    quater:"lycee deido",
+    quater:"Makepe, Carrefour express",
     city:"Douala",
     profilePicture:"",
-    role:"consumer",
+    role:"merchant",
     userPref:[],
     description:"a very good and talented person",
     apiKey:"45333"
@@ -65,14 +65,14 @@ const user = createSlice({
     initialState,
     reducers:{
         updateUser:(state, {payload}) => {
-            state.userId = payload.user_id;
+            state.userId = payload.userId;
             state.name = payload.name;
             state.email = payload.email;
             state.quater = payload.quater
             state.city = payload.city;
-            state.profilePicture = payload.profile_picture;
+            state.profilePicture = payload.profilePhoto;
             state.role = payload.role;
-            state.apiKey = payload.api_key;
+            state.apiKey = payload.apiKey;
             state.description = payload.description;
         },
         updateUserId:(state, {payload}) => {

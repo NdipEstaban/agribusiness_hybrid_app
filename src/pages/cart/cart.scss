@@ -7,6 +7,11 @@ ion-toolbar{
     }
 }
 
+.cart-radio-btn{
+    display:block !important;
+}
+
+
 .receipt__modal{
     color:#282828;
     // display:flex;
@@ -61,5 +66,40 @@ ion-toolbar{
             margin-bottom:1rem;
             width:75%;
         }
+    }
+}
+
+.ongoing-cart-orders{
+    padding:0.5rem;
+}
+
+@media screen and (min-width:768px){
+    .cart-radio-btn{
+        display:none !important;
+    }
+
+    
+    .cart-page-content{
+        width:100%;
+        height:100%;
+        display:flex;
+        gap:1rem;
+        flex-direction: row-reverse;
+        max-width:110rem;
+        position:absolute;
+
+        left:50%;
+        transform:translateX(-50%);
+    }
+
+    
+    .ongoing-cart-orders{
+        display:block !important;
+        width:100%;
+    }
+
+    .pending-cart-orders{
+        display:block !important;
+        width:100%;
     }
 }

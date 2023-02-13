@@ -26,21 +26,17 @@ interface ProductCardProps{
     image:string,
     tab:string,
     productId:string,
-    cardAction?:(param:string) => void
+    cardAction:(param:any) => void,
 }
 
 
-const ProductCard:React.FC<ProductCardProps> = ({price, name, description, merchantId, image, tab, productId}):JSX.Element => {
-    const dispatch = useAppDispatch();
-    const {addPendingOrder, pendingOrders} = useStorage();
+const ProductCard:React.FC<ProductCardProps> = ({price, name, description, merchantId, image, tab, productId, cardAction}):JSX.Element => {
     const userRole = useAppSelector((state:any) => state.user.role);
     const [deleteProduct] = useDeleteProductMutation();
-    const productModal = useRef<HTMLIonModalElement>(null);
     const [present] = useIonActionSheet();
     const [isOpen, setIsOpen] = useState(false);
     const history = useHistory();
     const [getMerchant, {data:merchant}] = useGetUserByIdMutation();
-    
 
     const closeModal = () => {
         setIsOpen(false);
@@ -66,13 +62,10 @@ const ProductCard:React.FC<ProductCardProps> = ({price, name, description, merch
                 merchantPhoto:data?.profile_picture,
                 productName:name
             }
-            addPendingOrder(order)
+
+            cardAction(order);
         });
     }
-
-    useEffect(() => {
-        dispatch(updatePendingOrders(pendingOrders));
-    }, [pendingOrders])
 
     return(
         <div className='product__card' onClick={() => getMerchant(merchantId)}>

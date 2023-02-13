@@ -1,6 +1,6 @@
 import {IonButton, IonTitle, IonContent, IonGrid, IonHeader, IonImg, IonInput, IonItem, IonLabel, IonList, IonPage, IonRow, IonSelect, IonSelectOption, useIonLoading} from '@ionic/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faImage } from '@fortawesome/free-solid-svg-icons';
+import { faBiking, faCar, faImage, faTruck, faTruckPickup } from '@fortawesome/free-solid-svg-icons';
 import './create_account.scss';
 import React, {RefObject, useRef, useState } from 'react';
 import cities from '../../assets/constants/cities';
@@ -16,6 +16,7 @@ import { updateUser } from '../../redux/features/user/userSlice';
 import { decryptRequest } from '../../utils/crypto_utility';
 import { useIonAlert } from '@ionic/react';
 import { User, useStorage } from '../../hooks/useStorage';
+import { current } from '@reduxjs/toolkit';
 
 
 let nameRegex = /^[a-zA-Z]{2,}\s[a-zA-Z]{2,}/;
@@ -31,6 +32,11 @@ const inputHandler = (e:React.ChangeEvent<HTMLInputElement>,regex:RegExp, setVal
         setValue([inputValue, false]);
         inputRef.current?.classList.add("input-error");
     }
+}
+
+let ratesPrices:number[] = [];
+for(let i = 1000; i <= 50000; i+= 500){
+    ratesPrices.push(i);
 }
 
 type SignInLevel = 1 | 2 | 3 | 4 | 5 | 6;
@@ -198,13 +204,58 @@ export const CreateAccount:React.FC = () => {
 
     //set userPrefference depending on the type of user, products for merchants and consumers and city for delivery
     const handleUserPref = (e:any) => {
-        setUserPref([...e.detail.value])
+        if(role === 'delivery'){
+            
+            let userPrefs = [...userPref];
+            let {field, value} = e;
+            if(field === 'city'){
+                userPrefs[0] = value;
+            }else if(field === 'vehicle'){
+                userPrefs[1] = value;
+            }else{
+                userPrefs[2] = value;
+            }
+            setUserPref(userPrefs);
+        }else{
+            setUserPref([...e.detail.value]);
+        }
     }
 
     //send sign in information to database
     const handleSignIn = () => {
+
+        //check if userpref has been entered
+        if(role === 'merchant'){
+            if(userPref.length < 1){
+                presentAlert({
+                    header:"Empty field",
+                    message:"please choose a product"
+                });
+                return;
+            }
+        }else if(role === 'delivery'){
+            if(userPref.length < 2){
+                presentAlert({
+                    header:"Empty field",
+                    message:"Please fill in all the fields"
+                });
+                return;
+            }
+        }else if(role === 'consumer'){
+            if(userPref.length < 2){
+                presentAlert({
+                    header:"Choose more products",
+                    message:"Please choose atleast 3 products"
+                })
+                return;
+            }
+        }else{
+            //nothing
+        }
+
+        console.log(userPref);
         let user = {
-            id:'',
+            userId:'',
             name:name[0], 
             profilePhoto:photo, 
             city,
@@ -212,16 +263,17 @@ export const CreateAccount:React.FC = () => {
             role, 
             email:email[0], 
             userPref:(role === 'merchant')?userPref.join(''):userPref,
-            apiKey:""
+            apiKey:"",
+            description:"Edit your description",
         };
 
-        signIn(user).then((result:any) => {
-            let data = decryptRequest(result?.data);
-            user.id = data?.userId;
-            user.apiKey = data?.apiKey
+        signIn(user).unwrap().then((result:any) => {
+            let data = decryptRequest(result);
+            user.userId = data?.userId;
+            user.apiKey = data?.apiKey;
             dispatch(updateUser(user));
-
-            history.push("/main")
+            history.push("/main");
+            markAuthed();
         }).catch(err => {
             presentAlert({
                 header: 'Oops, no network connection',
@@ -232,7 +284,7 @@ export const CreateAccount:React.FC = () => {
 
         let userDetails:User = {
             quater:quater[0],
-            userId:user.id,
+            userId:user.userId,
             email:email[0],
             name:name[0],
             city:city,
@@ -375,21 +427,21 @@ export const CreateAccount:React.FC = () => {
                         <React.Fragment>
                             <div className='proffession-container'>
                                 {/* <h3>What will you be doing?</h3> */}
-                                <button className='prof-card trader' onClick={() => setRole('merchant')} type="button">
+                                <button className='prof-card trader' onClick={() => {setRole('merchant');setUserPref([])}} type="button">
                                     <h6>Merchant</h6>
                                     <p>
                                         I sell crops on the platform and I can make use 
                                         of the delivery services
                                     </p>
                                 </button>
-                                <button className='prof-card delivery' onClick={() => setRole('delivery')} type="button">
+                                <button className='prof-card delivery' onClick={() => {setRole('delivery');setUserPref([])}} type="button">
                                     <h6>Delivery</h6>
                                     <p>
                                         I offer delivery services to merchants and safely deliver
                                         crops from merchant to consumer
                                     </p>
                                 </button>
-                                <button className='prof-card producer' onClick={() => setRole('consumer')} type="button">
+                                <button className='prof-card producer' onClick={() => {setRole('consumer');setUserPref([])}} type="button">
                                     <h6>Consumer</h6>
                                     <p>
                                         I explore and purchase crops from merchants on the platform
@@ -403,13 +455,48 @@ export const CreateAccount:React.FC = () => {
                         <React.Fragment>
                             {(role === 'delivery')?
                                 <React.Fragment>
-                                    <p className='form_message'>
-                                        Select the cities which you deliver products to
-                                    </p>
                                     <label className='selection-label'>
-                                        <IonSelect className='selection' interface="popover" placeholder="Douala" multiple={true} onIonChange={(e) => handleUserPref(e)}>
+                                        City
+                                        <IonSelect className='selection' interface="popover" placeholder="Douala" onIonChange={(e) => handleUserPref({value: e.detail.value, field:'city'})}>
                                             {cities.map(i => <IonSelectOption key={i} value={i}>{i}</IonSelectOption>)}
                                         </IonSelect>
+                                    </label>
+                                    <label className='selection-label'>
+                                        Vehicle
+                                        <IonSelect className='selection' interface='popover' placeholder='bike' onIonChange={(e) => handleUserPref({value: e.detail.value, field:'vehicle'})}>
+                                            <IonSelectOption value={"bike"}>
+                                                <div>
+                                                    Bike
+                                                    <FontAwesomeIcon icon={faBiking} />
+                                                </div>
+                                                
+                                            </IonSelectOption>
+                                            <IonSelectOption value={"tricycle"}>
+                                                <FontAwesomeIcon icon={faCar} />
+                                                Tricycle
+                                            </IonSelectOption>
+                                            <IonSelectOption value={"pickup"}>
+                                                <FontAwesomeIcon icon={faTruckPickup} />
+                                                Pickup
+                                            </IonSelectOption>
+                                            <IonSelectOption value={"truck"}>
+                                                <FontAwesomeIcon icon={faTruck} />
+                                                Truck
+                                            </IonSelectOption>
+                                        </IonSelect>
+                                    </label>
+                                    <label className='selection-label'>
+                                        Rate
+                                        <div className='create__account-rate'>
+                                            <IonSelect className='selection' interface='popover' placeholder='1000' onIonChange={(e) => handleUserPref({value: e.detail.value, field:'rate'})}>
+                                                {
+                                                    ratesPrices.map(i => 
+                                                        <IonSelectOption value={i}>{i}</IonSelectOption>
+                                                    )
+                                                }
+                                            </IonSelect>XAF/Order
+                                        </div>
+                                        
                                     </label>
                                 </React.Fragment>
                                 :

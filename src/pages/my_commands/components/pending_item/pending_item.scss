@@ -2,6 +2,24 @@
     margin-bottom:0.5rem;
     width:100vw;
 
+    .btns{
+        margin-top:0.5rem;
+        display:flex;
+        justify-content: space-evenly;
+        gap:3rem;
+        color:white;
+
+        .chat-btn{
+            font-size:1.9rem;
+            border-radius:15px;
+        }
+
+        .decline-btn{
+            background:white;
+            border-radius:15px;
+        }
+    }
+
     .accordion-body{
         display:flex;
         flex-direction:column;

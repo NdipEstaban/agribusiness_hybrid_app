@@ -9,8 +9,9 @@ import NewsCard from '../../components/news_card/news_card';
 import { Interface } from 'readline';
 import { useGetAnnouncementsMutation,} from '../../../../redux/api/announcement/announceSlice';
 import { useGetConsumerProductsMutation, useGetProductsMutation} from '../../../../redux/api/product/productSlice';
-import { useAppSelector } from '../../../../hooks/redux_hooks';
+import { useAppDispatch, useAppSelector } from '../../../../hooks/redux_hooks';
 import { useStorage } from '../../../../hooks/useStorage';
+import { updatePendingOrders } from '../../../../redux/features/cart/cartSlice';
 
 interface featuredProps{
     style:any;
@@ -65,16 +66,11 @@ const Featured:React.FC<featuredProps> = (props):JSX.Element => {
         
     }
 
+
     useEffect(() => {
         setFeatured(featuredProducts.products);
         setcurrentPage(featuredProducts.page);
         fetchNewItems();
-    }, []);
-
-
-    useEffect(() => {
-        console.log("useEffect", featuredProducts);
-        fetchNewItems();//TODO:fIX useEffect so it fetches at each render
     }, []);
     
     return(
@@ -94,8 +90,8 @@ const Featured:React.FC<featuredProps> = (props):JSX.Element => {
                                                 description={item.description} 
                                                 image={item.image} 
                                                 merchantId={item.merchant_id}
-                                                tab="featured" 
-                                                cardAction={() => {}} 
+                                                tab="featured"
+                                                cardAction={props.cardAction}
                                             />
                                         )
                                     }else{
