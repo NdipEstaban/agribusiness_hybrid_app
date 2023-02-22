@@ -63,6 +63,7 @@ const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, me
             message:"Proceeding to payment modal",
             spinner:"circles"
         });
+        config.tx_ref += merchantName;
         config.amount = total;
         config.customer.name = consumer.name;
         config.customer.email = consumer.email;
@@ -75,15 +76,16 @@ const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, me
             consumerId:consumer.userId, 
             merchantId, 
             merchantPay:total, 
-            products
+            products,
+            consumerPhoneNumber:'',
         }
 
         makeFlutterWavePayment({
             callback:(response) => {
                 if(response.status === 'successful'){
-                    createOrder(order)
-                    .then(() => deleteItem(merchantId));
-
+                    order.consumerPhoneNumber = response.customer.phone_number
+                    createOrder(order);
+                    deleteItem(merchantId);
                     presentAlert({
                         header:"Payment successful",
                         message:"Your order is on the way, check it's progress from the ongoing tab"
@@ -148,7 +150,7 @@ const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, me
                     })}
                 </IonList>
                 <div className='accordion-footer'>
-                    <h3>Total: {total}XAF</h3>
+                    <h3>Total: {total}CFA</h3>
                     <IonButton shape='round' onClick={() => 
                         presentAlert({
                             header:"Proceed to payment?",

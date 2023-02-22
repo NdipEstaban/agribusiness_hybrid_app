@@ -22,7 +22,7 @@ const MyCommands:React.FC = () => {
             <IonHeader>
                 <IonToolbar>
                     <IonTitle>
-                        My Commands
+                        My Orders
                     </IonTitle>
                     <IonButton slot='end' fill='clear'>
                         <FontAwesomeIcon icon={faSortAlphaDownAlt} />
@@ -30,8 +30,14 @@ const MyCommands:React.FC = () => {
                 </IonToolbar>
             </IonHeader>
             <IonContent>
-                <RadioButton option1='Pending' option2='Ongoing' setHome={setCurrentTab} />
-                {currentTab === 'Pending'?<PendingCommands />:<CompletedCommands />}
+                <div className='my-commands'>
+                    <div className='commands-radio-btn'>
+                        <RadioButton option1='Pending' option2='Ongoing' setHome={setCurrentTab} />
+                    </div>
+                    <PendingCommands style={(currentTab !== "Pending")?{display:"none"}:{}} />
+                    <CompletedCommands style={(currentTab !== "Ongoing")?{display:"none"}:{}} />
+                    {/* {currentTab === 'Pending'?<PendingCommands />:<CompletedCommands />} */}
+                </div>
             </IonContent>
         </IonPage>
     );

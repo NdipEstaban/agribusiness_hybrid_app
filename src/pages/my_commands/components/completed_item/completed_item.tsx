@@ -2,72 +2,140 @@ import React from 'react';
 import { IonAvatar, IonContent, IonImg, IonItem, IonText, IonButton, IonAccordion } from '@ionic/react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLocation } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faBoxArchive, faCircleInfo, faDolly, faInfo, faInfoCircle, faLocation, faMotorcycle, faPersonBiking, faRoad, faTruck, faTruckPickup } from '@fortawesome/free-solid-svg-icons';
 
 import img from '../../../../assets/images/abic_logo.png';
 
 import './completed_item.scss';
 import ProgressBar from '../progress_bar/progress_bar';
+import { useAppSelector } from '../../../../hooks/redux_hooks';
 
-const CompletedItem:React.FC = () => {
+
+interface completedItemProps{
+    orderId:string,
+    consumerName:string,
+    consumerPhoto:string,
+    amount:number,
+    consumerLocation:string,
+    clientName?:string,
+    clientPhoto?:string,
+    deliveryLocation?:string,
+    delivery:any | null,
+    products:{name:string, quantity:number, unitPrice:number}[],
+    date:string
+
+}
+
+const CompletedItem:React.FC<completedItemProps> = ({orderId, consumerName, consumerPhoto, delivery, products, amount, consumerLocation, deliveryLocation, clientName, clientPhoto, date}):JSX.Element => {
+    const user = useAppSelector(state => state.user);
+
     return(
-        <IonAccordion value='pending' className='pending-item'>
+        <IonAccordion value={orderId} className='ongoing-command-item'>
             <IonItem slot='header'>
                 <IonAvatar>
-                    <img alt="merchant" src={img} />
+                    <img alt="merchant" src={consumerPhoto} />
                 </IonAvatar>
-                <div>
-                    <IonText>Ndip Estaban</IonText>
-                    <IonText>200,000CFA</IonText>
+                <div className='top-details'>
+                    <IonText className='ongoing-command-name'>{consumerName}</IonText>
+                    <IonText className='ongoing-command-date'>{date.slice(0, 10).split("-").reverse().join("/")}     {date.slice(11, 16)}</IonText>
                 </div>
             </IonItem>
             <div slot='content' className='accordion-body'>
-                <ProgressBar />
-                <div className='pending-location'>
-                    <h5>
-                        <FontAwesomeIcon icon={faLocation} />
-                        Location
-                    </h5>
-                    <IonText>
-                        Douala,Cite de palmier-carrefour express
-                    </IonText>
-                </div>
+                {
+                    user.role === 'merchant' &&
+                    <div className='pending-location'>
+                        <h6>
+                            <FontAwesomeIcon icon={faLocation} />
+                            Client's Location
+                        </h6>
+                        <IonText>
+                            {consumerLocation}
+                        </IonText>
+                    </div>
+                }
+                { 
+                    delivery !== null &&
+                    <div className='delivery-section'>
+                        <h6>
+                            <FontAwesomeIcon icon={faDolly} />
+                            In charge of delivery
+                        </h6>
+                        
+                            <div>
+                                <img src={delivery.image} className='delivery-img' alt='delivery description' />
+                                <p className='delivery-name'>{delivery.name}</p>
+                                <div className='vehicle-icon'>
+                                    {
+                                        delivery.vehicle === 'bike'?
+                                            <FontAwesomeIcon icon={faPersonBiking} />
+                                        :(delivery.vehicle === 'tricycle')?
+                                        <FontAwesomeIcon icon={faMotorcycle} />
+                                        :(delivery.vehicle === 'pickup')?
+                                        <FontAwesomeIcon icon={faTruckPickup} />
+                                        :<FontAwesomeIcon icon={faTruck} />
+                                    }
+                                </div>
+                            </div>
+                    </div>
+                 }
+                 {
+                    user.role === 'delivery' && 
+                    <div className='pending-location'>
+                        <IonText className='users-location'>
+                            <b>Merchant:</b>
+                            <span>{consumerLocation}</span>
+                        </IonText>
+                        <span className='road-icon'><FontAwesomeIcon icon={faRoad} /></span>
+                        <IonText className='users-location'>
+                            <b>Client</b>
+                            <span>{deliveryLocation}</span>
+                        </IonText>
+                    </div>
+                 }
+                 {
+                    user.role === 'delivery' &&
+                    <div className='delivery-section'>
+                        <h6>
+                            <FontAwesomeIcon icon={faDolly} />
+                            Deliver to...
+                        </h6>
+                        
+                            <div>
+                                <img src={clientPhoto} className='delivery-img' alt='delivery description' />
+                                <p className='delivery-name'>{clientName}</p>
+                                <div className='vehicle-icon'>
+                                    
+                                </div>
+                            </div>
+                    </div>
+                 }
                 <table>
                     <tr>
                         <th>Product</th>
                         <th>Quantity(Kg)</th>
-                        <th>Price per Kg</th>
+                        {user.role !== 'delivery' && <th>Unit Total</th>}
                         {/* <th>Total price</th> */}
                     </tr>
-                    <tr>
-                        <td>Inyames</td>
-                        <td>08</td>
-                        <td>14,000</td>
-                        {/* <td>122,0000</td> */}
-                    </tr>
-                    <tr>
-                        <td>Banana</td>
-                        <td>08</td>
-                        <td>12,000</td>
-                        {/* <td>100,000</td> */}
-                    </tr>
-                    <tr>
-                        <td>Orange</td>
-                        <td>09</td>
-                        <td>1,000</td>
-                        {/* <td>12,000</td> */}
-                    </tr>
-                    <tr>
-                        <td>Beans</td>
-                        <td>08</td>
-                        <td>13,000</td>
-                        {/* <td>50,000</td> */}
-                    </tr>
+                    {products.map((product:{name:string, quantity:number, unitPrice:number}) => (
+                        <tr>
+                            <td>{product.name}</td>
+                            <td>{product.quantity}</td>
+                            {
+                                user.role !== 'delivery' &&
+                                <td key={product.name+orderId}>{product.quantity * product.unitPrice} CFA </td>
+                            }
+                        </tr>
+                    ))}
                 </table>
                 <div className='ongoing-item-footer'>
-                    <h5>Incoming: 200,000</h5>
-                    <h5>Delivery Charges: 90,000</h5>
-                    <h5>Profit: 180, 000</h5>
+                    <h6>Incoming: {amount} CFA</h6>
+                    {user.role === 'merchant' &&
+                        <React.Fragment>
+                            <h6>Delivery Charges: {delivery?.deliveryRate | 0} CFA</h6>
+                            <h6>Profit: {amount - delivery?.deliveryRate | 0} CFA</h6>
+                        </React.Fragment>
+                        
+                    }
                 </div>
             </div>
         </IonAccordion>

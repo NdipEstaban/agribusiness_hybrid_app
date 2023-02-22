@@ -43,8 +43,8 @@ const OngoingCartItem:React.FC<ongoingItemProps> = ({merchantName, merchantPhoto
                         <th>Quantity(Kg)</th>
                         <th>Price per Kg</th>
                     </tr>
-                    {products.map((product:any) => 
-                        <tr>
+                    {products.map((product:any, n) => 
+                        <tr key={n + 'ongoing'+orderId + product.name}>
                             <td>{product.name}</td>
                             <td>{product.quantity}</td>
                             <td>{product.unitPrice}</td>
@@ -52,7 +52,7 @@ const OngoingCartItem:React.FC<ongoingItemProps> = ({merchantName, merchantPhoto
                     )}
                 </table>
                 <div className='accordion-footer'>
-                    <h4>Total Paid:{amountPaid}</h4>
+                    <h4>Total Paid: {amountPaid}CFA</h4>
                     <IonButton shape='round' onClick={() => handleCompleteOrder()}>
                         MARK AS RECIEVED
                     </IonButton>

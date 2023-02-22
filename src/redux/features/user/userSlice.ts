@@ -14,16 +14,42 @@ interface User {
     apiKey:string;
 }
 
+// const initialState:User = {
+//     userId:"536b0537-9240-4a9c-97a9-7d39505ab5a4",
+//     name:"new user",
+//     email:"newuser@gmail.com",
+//     quater:"Makepe, Carrefour express",
+//     city:"baffoussam",
+//     profilePicture:"",
+//     role:"delivery",
+//     userPref:[],
+//     description:"a very good and talented person",
+//     apiKey:"45333"
+// }
+
+// const initialState:User = {
+//     userId:"46a7ac12-ab22-4803-be9c-5bc9d895cff1",
+//     name:"Ndip Estaban Tabe",
+//     email:"estabannd@gmail.com",
+//     quater:"Makepe, Carrefour express",
+//     city:"Douala",
+//     profilePicture:"",
+//     role:"merchant",
+//     userPref:[],
+//     description:"a very good and talented person",
+//     apiKey:"45333"
+// }
+
 const initialState:User = {
-    userId:"46a7ac12-ab22-4803-be9c-5bc9d895cff1",
-    name:"Ndip Estaban Tabe",
-    email:"estabannd@gmail.com",
-    quater:"Makepe, Carrefour express",
-    city:"Douala",
+    userId:"dd19f290-a326-44a0-9659-24e04d685948",
+    name:"james cameron",
+    email:"wordleplus@gmail.com",
+    quater:"socada",
+    city:"baffoussam",
     profilePicture:"",
-    role:"merchant",
+    role:"consumer",
     userPref:[],
-    description:"a very good and talented person",
+    description:"a very good consumer",
     apiKey:"45333"
 }
 

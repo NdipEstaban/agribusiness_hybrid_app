@@ -60,7 +60,8 @@ const Cart:React.FC<cartProps> = ({deleteOrder, pendingOrders, updateOrder}):JSX
                             {(isError === true) && <h3>Sorry, your orders are only available online for your security</h3>}
                             {
                                 consumerOrders?.map((order:any) =>
-                                    <OngoingCartItem 
+                                    <OngoingCartItem
+                                        key={order.orderId}
                                         merchantName={order.merchantName} 
                                         merchantPhoto={order.merchantPhoto} 
                                         products={order.products} 

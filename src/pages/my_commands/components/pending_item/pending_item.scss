@@ -1,6 +1,7 @@
-.pending-item{
+.pending-command-item{
     margin-bottom:0.5rem;
-    width:100vw;
+    width:100%;
+    text-transform: capitalize !important;
 
     .btns{
         margin-top:0.5rem;
@@ -29,15 +30,28 @@
             width:90%;
             background:#d2e0f8;
             align-self: center;
-            padding:0.5rem 0;
+            padding:0.5rem;
             border-radius:15px;
             display: flex;
             flex-direction: column;
-            align-items: center;
 
             h5{
                 margin:0 0 0.25rem 0;
                 color:#282828;
+            }
+
+            .users-location{
+                display:flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            b{
+                font-weight: 600;
+            }
+
+            .road-icon{
+                color:grey;
             }
         }
     
@@ -70,4 +84,43 @@ table{
     tr{
         text-align: center;
     }
+}
+
+.delivery-service-details{
+    border-bottom:1px solid grey;
+    color:#282828;
+
+    .delivery-service-section{
+        display:flex;
+        flex-direction: row;
+        align-items: center;
+        width:10rem;
+        margin-left:-0.5rem;
+
+        .delivery-picture{
+            width:3rem;
+            height:3rem;
+            border-radius:50%;
+        }
+    }
+
+    .delivery-attrs{
+        display:flex;
+        flex-direction: column;
+        min-width:12rem;
+        margin-left:-1.4rem;
+        justify-content: center;
+        align-items: center;
+
+        .vehicles-icon{
+            font-size:1.5rem;
+            margin-bottom:-1rem;
+            color:grey;
+        }
+
+        .delivery-rate{
+            font-weight:500;
+        }
+    }
+
 }

@@ -13,14 +13,79 @@ const orderSlice = createApi({
                 return decryptRequest(responseData);
             }
         }),
-        getMerchantOrders:builder.query({
-            query:(id:string) => `get-merchant-orders?merchantId=${id}`
+        getMerchantPendingOrders:builder.query({
+            query:(id:string) => `get-merchant-pending-orders?merchantId=${id}`,
         }),
-        getDeliveryOrders:builder.query({
-            query:(id:string) => `get-delivery-orders?deliveryId=${id}`
+        getMerchantOngoingOrders:builder.query({
+            query:(id:string) => `get-merchant-ongoing-orders?merchantId=${id}`,
+            transformResponse: responseData => {
+                return decryptRequest(responseData)
+            }
+        }),
+        deliveryDeclineOrder:builder.mutation({
+            query:(details:any) => ({
+                url:"delivery-decline-order",
+                method:"PUT",
+                body:{
+                    deliveryId:details.deliveryId,
+                    orderId:details.orderId
+                }
+            }),
+        }),
+        deliveryAceptOrder:builder.mutation({
+            query:(details:any) => ({
+                url:"delivery-accept-order",
+                method:"PUT",
+                body:{
+                    deliveryId:details.deliveryId,
+                    orderId:details.orderId
+                }
+            }),
+        }),
+        getDeliveryPendingOrders:builder.query({
+            query:(id:string) => `get-delivery-pending-orders?deliveryId=${id}`,
+            transformResponse: responseData => {
+                return decryptRequest(responseData)
+            }
+        }),
+        getDeliveryOngoingOrders:builder.query({
+            query:(id:string) => `get-delivery-ongoing-orders?deliveryId=${id}`,
+            transformResponse: responseData => {
+                return decryptRequest(responseData)
+            }
         }),
         confirmDelivery:builder.query({
             query:(id:string) => `consumer-confirm-delivery?${id}`
+        }),
+        merchantSelfDelivery:builder.mutation({
+            query:(orderId:string) => ({
+                url:"merchant-self-delivery",
+                method:"PUT",
+                body:{
+                    orderId:encryptResponse(orderId)
+                }
+            })
+        }),
+        addDeliveryPayment: builder.mutation({
+            query:(info:any) => ({
+                url:"add-delivery-payment",
+                method:"PUT",
+                body:{
+                    deliveryId:encryptResponse(info.deliveryId),
+                    amount:encryptResponse(info.amount),
+                    orderId:encryptResponse(info.orderId),
+                    merchantPhoneNumber:encryptResponse(info.merchantPhoneNumber)
+                }
+            }),
+        }),
+        merchantDeclineOrder:builder.mutation({
+            query:(orderId:string) => ({
+                url:"merchant-decline-order",
+                method:"DELETE",
+                body:{
+                    orderId:encryptResponse(orderId)
+                }
+            })
         }),
         createOrder: builder.mutation({
             query:(info) => ({
@@ -62,15 +127,20 @@ const orderSlice = createApi({
 
 export const {
     useLazyGetConsumerOrdersQuery,
-    useLazyGetDeliveryOrdersQuery,
-    useLazyGetMerchantOrdersQuery,
+    useMerchantSelfDeliveryMutation,
+    useLazyGetMerchantPendingOrdersQuery,
+    useAddDeliveryPaymentMutation,
     useGetConsumerOrdersQuery,
-    useGetDeliveryOrdersQuery,
-    useGetMerchantOrdersQuery,
+    useLazyGetDeliveryPendingOrdersQuery,
     useDeleteOrderMutation,
     useCancelOrderMutation,
     useUpdateOrderMutation,
     useCreateOrderMutation,
+    useMerchantDeclineOrderMutation,
+    useLazyGetMerchantOngoingOrdersQuery,
+    useDeliveryAceptOrderMutation,
+    useDeliveryDeclineOrderMutation,
+    useLazyGetDeliveryOngoingOrdersQuery
 } = orderSlice
 
 export default orderSlice

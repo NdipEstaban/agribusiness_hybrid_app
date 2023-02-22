@@ -11,9 +11,8 @@ import './user_profile.scss';
 import ProductCard from '../home/components/product_card/product_card';
 import AccountCard from '../../components/account_card/account_card';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAdd, faArrowLeft, faMessage, faTruck } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faMessage, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { useGetUserByIdMutation} from '../../redux/api/user/userSlice';
-import { useGetDeliveryOrdersQuery, useLazyGetConsumerOrdersQuery, useLazyGetDeliveryOrdersQuery, useLazyGetMerchantOrdersQuery } from '../../redux/api/order/orderSlice';
 import { useAppSelector } from '../../hooks/redux_hooks';
 
 

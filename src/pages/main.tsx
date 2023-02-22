@@ -12,7 +12,7 @@ import {
   useIonViewDidEnter,
 } from '@ionic/react';
 import { IonReactRouter, } from '@ionic/react-router';
-import { cart, home, chatbox, person, search } from 'ionicons/icons';
+import { cart, home, chatbox, person, search, list, tabletPortraitSharp, shapesOutline, storefront, storefrontOutline, storefrontSharp, cartSharp, chatboxSharp, searchSharp } from 'ionicons/icons';
 
 import { showTabBar } from '../utils/iontabbar-controller';
 
@@ -28,9 +28,11 @@ import MyCommands from './my_commands/my_commands';
 
 import './main.scss';
 import { useStorage } from '../hooks/useStorage';
+import { useAppSelector } from '../hooks/redux_hooks';
 
 const Main = () => {
     const {pendingOrders, deletePendingOrder, addPendingOrder, updatePendingOrdersProduct} = useStorage();
+    const user = useAppSelector(state => state.user);
 
     return (
         <IonReactRouter>
@@ -61,9 +63,13 @@ const Main = () => {
             <ChatPage />
           </Route>
 
-          <Route path="/main/cart">
-            <MyCommands />
-            {/* <Cart  deleteOrder={deletePendingOrder} updateOrder={updatePendingOrdersProduct} pendingOrders={pendingOrders}/> */}
+          <Route path="/main/orders">
+            {
+              user.role === 'consumer'?
+              <Cart  deleteOrder={deletePendingOrder} updateOrder={updatePendingOrdersProduct} pendingOrders={pendingOrders}/>
+              :
+              <MyCommands />
+            }
           </Route>
           <Route exact path="/main/account/">
             <Account/>
@@ -75,16 +81,27 @@ const Main = () => {
             <IonLabel>Home</IonLabel>
           </IonTabButton>
           <IonTabButton tab="search" href="/main/search">
-            <IonIcon icon={search} />
+            <IonIcon icon={searchSharp} />
             <IonLabel>Search</IonLabel>
           </IonTabButton>
           <IonTabButton tab="messaging" href="/main/messaging">
-            <IonIcon icon={chatbox} />
+            <IonIcon icon={chatboxSharp} />
             <IonLabel>Chats</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="cart" href="/main/cart">
-            <IonIcon icon={cart} />
-            <IonLabel>Cart</IonLabel>
+          <IonTabButton tab="orders" href="/main/orders"> 
+            {
+              user.role === 'consumer'?
+              <React.Fragment>
+                <IonIcon icon={cartSharp} />
+                <IonLabel>Cart</IonLabel>
+              </React.Fragment>
+              :
+              <React.Fragment>
+                <IonIcon icon={storefrontSharp} />
+                <IonLabel>Orders</IonLabel>
+              </React.Fragment>
+            }
+            
           </IonTabButton>
           <IonTabButton tab="account" href="/main/account">
             <IonIcon icon={person}/>

@@ -1,0 +1,31 @@
+@media screen and (min-width:768px){
+    .pending-commands-container{
+        overflow-y: scroll;
+        padding:0.5rem;
+        width:50%;
+        height:100%;
+        display:flex !important;
+        flex-direction: column;
+        border-radius:15px;
+        background: #ffffff;
+        box-shadow:  10px 10px 20px #d9d9d9,
+                    -10px -10px 20px #ffffff;
+    }
+}
+
+.error-message{
+    width:20rem;
+    z-index:20;
+    position: absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%, -50%);
+    font-size:2rem;
+}
+
+.orders-section-title{
+    font-size:1.3rem;
+    font-weight: 600;
+    margin-bottom:1rem;
+    margin-left:0.5rem;
+}
