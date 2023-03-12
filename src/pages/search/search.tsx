@@ -29,7 +29,7 @@ const Search:React.FC = () => {
 
         if(query.length > 0){
             searchProducts(query).then((prods) => {
-                searchUsers(query).then((users) => {
+                searchUsers(query).then((users:any) => {
                     let fetchedProducts = decryptRequest(prods.data);
                     let fetchedUsers = decryptRequest(users.data);
                     let searchResults = {

@@ -1,11 +1,34 @@
 $message-read:rgb(182, 255, 99);
 
+@keyframes sendMessageAnimation {
+    0%{
+        transform: translateX(100px);
+    };
+    100%{transform: translateX(0px)};
+}
+
+@keyframes incomingMessage {
+    0%{
+        transform: translateX(-100px);
+    };
+    100%{transform: translateX(0px)};
+}
+
 .chat__message__box{
     width:12rem;
     padding:0.5rem;
-    border-radius:22px;
+    border-radius:15px;
     color:black;
     margin:0.5rem 0.1rem;
+    border-radius:25px 25px 25px 5px;
+    background: linear-gradient(145deg, #e6e6e6, #ffffff);
+    box-shadow:  5px 5px 10px #d9d9d9,
+             -5px -5px 10px #ffffff;
+
+    
+    img{
+        border-radius: 25px;
+    }
 
     .chat__message__box-text{
         margin-right:0.2rem;
@@ -23,14 +46,71 @@ $message-read:rgb(182, 255, 99);
     }
 }
 
+
+
+ion-modal.view-image-modal{
+    background:black;
+    --background:black;
+
+    img{
+        width:100vw;
+        position: absolute;
+        top:50%;
+        left:50%;
+        transform:translate(-50%, -50%);
+    }
+
+    .image-text{
+        position: absolute;
+        bottom:5%;
+        left:50%;
+        transform:translate(-50%, -50%);
+        padding:1rem 1rem;
+        width:99vw;
+        font-weight: 600;
+        background:rgb(203, 216, 247);
+    }
+}
+
 .sender{
     position:relative;
     left:50%;
     background:linear-gradient(120deg, #003ffc 0%, #4d8dfc);
     color:white;
+    animation: sendMessageAnimation 0.3s ease;
+    transition: all 0.5s ease;
+    box-shadow:  5px 5px 10px #4d8dfc;
+    border-radius:25px 25px 5px 25px;
 
     .chat-icon{
         display:inline-block;
         color:$message-read;
+    }
+}
+
+.reciever{
+    animation: incomingMessage 0.3s ease;
+}
+
+@media screen and (min-width:768px){
+    .chat__message__box{
+        width:20rem;
+        font-size:1.1rem;
+    }
+
+    .sender{
+        position:relative;
+        left:40%;
+        background:linear-gradient(120deg, #003ffc 0%, #4d8dfc);
+        color:white;
+        animation: sendMessageAnimation 0.3s ease;
+        transition: all 0.5s ease;
+        box-shadow:  5px 5px 10px #4d8dfc;
+        border-radius:25px 25px 0px 25px;
+    
+        .chat-icon{
+            display:inline-block;
+            color:$message-read;
+        }
     }
 }

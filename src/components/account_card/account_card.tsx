@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonFabButton, IonImg, IonText } from '@ionic/react';
+import { IonButton, IonFabButton, IonImg, IonText } from '@ionic/react';
 
 import './account_card.scss'; 
 
@@ -10,13 +10,14 @@ import { faLocationCrosshairs, faLocationDot, faMapLocation, faMessage, faPen, f
 interface AccountCardProps{
     id?:string;
     name?:string;
-    description?:string;
+    description?:any;
     city?:string;
     role?:string;
     image?:string;
     edit:Boolean;
     email?:string;
     quarter?:string;
+    openEditForm?:React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const AccountCard:React.FC<AccountCardProps> = (props):JSX.Element => {
@@ -31,9 +32,11 @@ const AccountCard:React.FC<AccountCardProps> = (props):JSX.Element => {
                         {props.name}
                     </IonText>
                     <IonText className='user-description'>
-                        A good merchant which sells mainly beans,
-                        groundnuts and all other type of agricultural products...
-                        {props.description}
+                        {props.description?.split('').filter((i:string) => i !== ' ').join('').length > 0?
+                            <>{props.description}</>
+                        :
+                        <>No description added, edit your description by tapping on the <FontAwesomeIcon icon={faPen} /> button</>
+                        }
                     </IonText>
                 </div>
                 
@@ -57,9 +60,9 @@ const AccountCard:React.FC<AccountCardProps> = (props):JSX.Element => {
                 </IonText>
             </div>
                 {props.edit &&
-                    <IonFabButton className='edit-button' id={props.id}>
+                    <button className='edit-button' id={props.id}>
                         <FontAwesomeIcon icon={faPen} />
-                    </IonFabButton>
+                    </button>
                 }
         </div>
     );

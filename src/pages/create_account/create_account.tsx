@@ -17,6 +17,8 @@ import { decryptRequest } from '../../utils/crypto_utility';
 import { useIonAlert } from '@ionic/react';
 import { User, useStorage } from '../../hooks/useStorage';
 import { current } from '@reduxjs/toolkit';
+import { useLazyGetUserDataQuery } from '../../redux/api/backup/backup';
+import { useChatsStorage } from '../../hooks/useChatStorage';
 
 
 let nameRegex = /^[a-zA-Z]{2,}\s[a-zA-Z]{2,}/;
@@ -55,10 +57,12 @@ export const CreateAccount:React.FC = () => {
     const history = useHistory();
     const [presentAlert] = useIonAlert();
     const [presentLoader, dismissLoader] = useIonLoading();
-    const {saveUserDetails, markAuthed} = useStorage();
+    const {saveUserDetails, markAuthed, restorePendingOrders} = useStorage();
+    const {restoreChatData} = useChatsStorage();
 
     const [signIn, {isLoading:signInLoading, isError:signInError, isSuccess:signInSuccess}] = useSignInMutation();
     const [sendOtp, {data:otp, isLoading, isSuccess:otpSuccess}] = useSendOtpMutation();
+    const [getBackupData] = useLazyGetUserDataQuery();
     const [logIn, {}] = useLogInMutation();
     const [updateConsumer] = useUpdateConsumerMutation();
     const [updateMerchant] = useUpdateMerchantMutation();
@@ -147,6 +151,12 @@ export const CreateAccount:React.FC = () => {
                         let data = decryptRequest(info.data);
                         dispatch(updateUser(data));
                         setUserExist(true);
+
+                        //restore backup data, will return empty arrays if none
+                        getBackupData(data.user_id).unwrap().then((backup) => {
+                            restoreChatData(backup.chatsData);
+                            restorePendingOrders(backup.pendingOrdersData);
+                        });
     
                         let userDetails:User = {
                             quater:data.quater,
@@ -197,7 +207,7 @@ export const CreateAccount:React.FC = () => {
         const image = await Camera.getPhoto({
             quality: 90,
             allowEditing: true,
-            resultType: CameraResultType.DataUrl
+            resultType: CameraResultType.DataUrl,
           });
           setPhoto(image.dataUrl);
     }

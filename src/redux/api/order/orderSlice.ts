@@ -13,6 +13,12 @@ const orderSlice = createApi({
                 return decryptRequest(responseData);
             }
         }),
+        getRecentOrders:builder.query({
+            query:(data:any) => `get-recent-orders?userId=${data.userId}&role=${data.role}`,
+            transformResponse:responseData => {
+                return decryptRequest(responseData);
+            }
+        }),
         getMerchantPendingOrders:builder.query({
             query:(id:string) => `get-merchant-pending-orders?merchantId=${id}`,
         }),
@@ -140,7 +146,9 @@ export const {
     useLazyGetMerchantOngoingOrdersQuery,
     useDeliveryAceptOrderMutation,
     useDeliveryDeclineOrderMutation,
-    useLazyGetDeliveryOngoingOrdersQuery
+    useLazyGetDeliveryOngoingOrdersQuery,
+    useGetRecentOrdersQuery,
+    useLazyGetRecentOrdersQuery
 } = orderSlice
 
 export default orderSlice

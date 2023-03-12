@@ -31,6 +31,23 @@ export interface pendingOrderItem{
     products:{productId:string, name:string, unitPrice:string, quantity:string}[];
 }
 
+// export interface chatItem{
+//     userId:string,
+//     name:string,
+//     image:string,
+//     messages:messageItem[]
+// }
+
+// export interface messageItem{
+//     id:string,
+//     text:string,
+//     time:string,
+//     date:string,
+//     recieved:Boolean,
+//     source:string,
+//     image:string | null
+// }
+
 export const useStorage = () => {
     const [store, setStore] = useState<Storage>();
     const [pendingOrders, setPendingOrders] = useState<pendingOrderItem[]>([]);
@@ -70,7 +87,12 @@ export const useStorage = () => {
     
     //Hooks for storage of users info
     const saveUserDetails = async(user:User) => {
+        setUserDetials(user);
         await store?.set(USER_DETAILS_KEY, user);
+    }
+
+    const clearUserDetails = async() => {
+        await store?.clear();
     }
 
     const markAuthed = async() => {
@@ -86,8 +108,6 @@ export const useStorage = () => {
     const addPendingOrder = async(order:{merchantId:string, merchantName:string, productId:string, productName:string, unitPrice:string, merchantPhoto:string}) => {
         let currentPendingOrders = [...pendingOrders];
         let merchantOrderExist:Boolean = false;
-        console.clear();
-        console.log(pendingOrders);
         //Check if already have an order with this merchant using merchantId
         currentPendingOrders.map((item:pendingOrderItem) => {
             if(order.merchantId === item.merchantId){
@@ -117,8 +137,6 @@ export const useStorage = () => {
             console.log(productIndex);
             //if product doesn't exist in list of products then add it to the top of list
             if(productIndex === -1){
-                console.log("modified order");
-                console.log("current products");
                 console.log(currentOrder.products);
                 let newProducts = [{
                     productId:order.productId,
@@ -126,9 +144,6 @@ export const useStorage = () => {
                     unitPrice:order.unitPrice,
                     quantity:"1"
                 }, ...currentOrder.products];
-
-                console.log("new products")
-                console.log(newProducts);
 
                 let updatedOrder:pendingOrderItem = {
                     merchantId:currentOrder.merchantId,
@@ -146,7 +161,6 @@ export const useStorage = () => {
         await store?.set(PENDING_ORDERS_KEY, currentPendingOrders);
     }
 
-    //TODO:impliment update and delete function
     const updatePendingOrdersProduct = async(product:{productId:string, quantity:string, merchantId:string}) => {
         //Add a new product under a new merchant if merchant is not in order's list
         let updatedPendingOrders = pendingOrders.map((order:pendingOrderItem) => {
@@ -163,7 +177,6 @@ export const useStorage = () => {
 
     const deletePendingOrder = async(merchantId:string) => {
         let newPendingOrder = [...pendingOrders].filter((item:pendingOrderItem) => item.merchantId !== merchantId);
-        console.log(newPendingOrder);
         setPendingOrders(newPendingOrder);
         await store?.set(PENDING_ORDERS_KEY, newPendingOrder);
         console.log('pendingorders', newPendingOrder);
@@ -198,6 +211,21 @@ export const useStorage = () => {
         await store?.set(SEARCH_HISTORY_KEY, newSearchHistory);
     }
 
+    const retrievePendingOrders = async() => {
+        let pendingOrders = await store?.get(PENDING_ORDERS_KEY);
+        return pendingOrders;
+    }
+
+    const restorePendingOrders = async(newPendingOrders:pendingOrderItem[]) => {
+        await store?.set(PENDING_ORDERS_KEY,newPendingOrders);
+    }
+
+    const updateUserEmail = async(newEmail:string) => {
+        let userDetails = await store?.get(USER_DETAILS_KEY);
+        userDetails.email = newEmail;
+        await store?.set(USER_DETAILS_KEY,userDetails);
+    }
+
     useEffect(() => {
         initStorage();
         console.log("useEffect is running")
@@ -208,16 +236,21 @@ export const useStorage = () => {
         addPendingOrder,
         updatePendingOrdersProduct,
         deletePendingOrder,
+        restorePendingOrders,
 
         userDetails,
         saveUserDetails,
         markAuthed,
+        updateUserEmail,
+        clearUserDetails,
         
         featuredProducts,
         saveFeaturedProducts,
 
         searchHistory,
         saveSearchHistory,
-        deleteSearchHIstory
+        deleteSearchHIstory,
+
+        retrievePendingOrders,
     }
 }

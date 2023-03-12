@@ -24,14 +24,27 @@ const userSlice = createApi({
                 }
             }),
         }),
+        updateUserEmail:builder.mutation({
+            query: (data:any) => ({
+                url:"update-user-email",
+                method:"PUT",
+                body:{
+                    userId:data.userId,
+                    newEmail:data.email
+                }
+            })
+        }),
         updateUser:builder.mutation({
             query: (user) => ({
                 url:"update-user",
                 method:"PUT",
                 body:{
-                    ...user
+                    userDetails:encryptResponse(user)
                 }
             }),
+            transformResponse: response => {
+                return decryptRequest(response);
+            }
         }),
         updateMerchant:builder.mutation({
             query:(info) => ({
@@ -71,7 +84,8 @@ export const {
     useUpdateUserMutation,
     useUpdateDeliveryMutation,
     useUpdateConsumerMutation,
-    useUpdateMerchantMutation
+    useUpdateMerchantMutation,
+    useUpdateUserEmailMutation
 } = userSlice;
 
 export default userSlice

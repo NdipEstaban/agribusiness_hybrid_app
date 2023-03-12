@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Redirect, Route, useRouteMatch, useHistory} from 'react-router-dom';
 import { IonContent,IonText, IonBadge, IonRouterOutlet, IonTabs, IonTab, IonTabBar, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonTabButton, IonIcon, IonLabel } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -18,7 +18,7 @@ import Notifications from "../notifications/notifications";
 
 import "./home.scss";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux_hooks";
-import { pendingOrderItem } from "../../hooks/useStorage";
+import { pendingOrderItem, useStorage } from "../../hooks/useStorage";
 
 interface HomeProps{
     addOrder:(params:any) => Promise<void>;
@@ -33,6 +33,7 @@ const Home:React.FC<HomeProps> = ({addOrder}):JSX.Element => {
     const goToNofifications = () => {
         history.push('/main/home/notifications');
     }
+
     
     return(
         <IonPage>

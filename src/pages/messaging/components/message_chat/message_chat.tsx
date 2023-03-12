@@ -1,8 +1,8 @@
 import React from 'react';
-import {IonItem, IonBadge, IonImg, IonText} from '@ionic/react';
+import {IonItem, IonBadge, IonImg, IonText, IonAvatar} from '@ionic/react';
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faCheck, faDotCircle, } from '@fortawesome/free-solid-svg-icons';
+import {faCheck, faCheckDouble, faDotCircle, } from '@fortawesome/free-solid-svg-icons';
 import {faClock, faCircleDot} from '@fortawesome/free-regular-svg-icons';
 
 import './message_chat.scss';
@@ -10,34 +10,49 @@ import './message_chat.scss';
 import img from '../../../../assets/images/abic_logo.png';
 
 import textShortener from '../../../../utils/text_shortener';
+import { useHistory } from 'react-router';
+import { messageItem, chatItem } from '../../../../hooks/useChatStorage';
 
 interface MessageChatProps{
-    img:string,
-    name:string,
-    text:string,
-    date:Date,
-    status:string, //Determines if the message has been read or not
+    chatData:chatItem
+    //Determines if the message has been read or not
 }
 
-const MessageChat:React.FC = () => {
+const MessageChat:React.FC<chatItem> = ({userId, image, name, messages}):JSX.Element => {
+    const history = useHistory();
+
+    const openChat = () => {
+        history.push(`/main/message/chat-page/${userId}`, {from:window.location.pathname});
+    }
+
     return(
-        <IonItem lines='none' routerLink='/main/message/chat-page' routerDirection="forward" className="message__chat">
-            <div className='message__chat-image'>
-                <IonImg className='message__chat-image-img' src={img}></IonImg>
-            </div>
+        <IonItem lines='none' onClick={openChat} routerDirection="forward" className="message__chat">
+            <IonAvatar className='message__chat-image'>
+                <img className='message__chat-image-img' src={image} alt='recipient'/>
+            </IonAvatar>
             <div className='message__chat-details'>
-                <IonText className='message__chat-details-name'>Johnson Bosco</IonText>
-                <IonText className='message__chat-details-message'>Le maize la es de bonne qualite...</IonText>
+                <IonText className='message__chat-details-name'>{name}</IonText>
+                <IonText className='message__chat-details-message'>
+                    {
+                        messages[messages.length - 1]?.text
+                    }
+                </IonText>
             </div>
             <div className='message__chat-min-details'>
-                <IonText className='message__chat-min-details-date'>15/7/22</IonText>
+                <IonText className='message__chat-min-details-date'>
+                    {
+                        messages[messages.length - 1]?.date
+                    }
+                </IonText>
                 <IonBadge className="message__chat-min-details-indicator" color='none'>
-                    {/* {'successfully sent message'}
-                    <FontAwesomeIcon icon={faCheck} />
-                    {'recieved message'}
-                    <FontAwesomeIcon icon={faDotCircle} />
-                    {'unsent messages'} */}
-                    <FontAwesomeIcon icon={faClock} />
+                    {
+                        (messages[messages.length - 1]?.recieved === false && messages[messages.length - 1].source === 'sender')?
+                        <FontAwesomeIcon icon={faCheck} />
+                        :(messages[messages.length - 1]?.recieved === true && messages[messages.length - 1].source === 'sender')?
+                        <FontAwesomeIcon icon={faCheckDouble} />
+                        :(messages[messages.length - 1].source === 'reciever' && messages[messages.length - 1].recieved === false)?messages.filter((messages:messageItem) => messages.recieved === false).length
+                        :''
+                    }
                 </IonBadge>
             </div>
         </IonItem>

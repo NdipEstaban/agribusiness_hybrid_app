@@ -40,17 +40,31 @@ interface User {
 //     apiKey:"45333"
 // }
 
+// const initialState:User = {
+//     userId:"dd19f290-a326-44a0-9659-24e04d685948",
+//     name:"james cameron",
+//     email:"wordleplus@gmail.com",
+//     quater:"socada",
+//     city:"baffoussam",
+//     profilePicture:"",
+//     role:"consumer",
+//     userPref:[],
+//     description:"a very good consumer",
+//     apiKey:"45333"
+// }
+
+
 const initialState:User = {
-    userId:"dd19f290-a326-44a0-9659-24e04d685948",
-    name:"james cameron",
-    email:"wordleplus@gmail.com",
-    quater:"socada",
-    city:"baffoussam",
+    userId:"",
+    name:"",
+    email:"",
+    quater:"",
+    city:"",
     profilePicture:"",
-    role:"consumer",
+    role:"",
     userPref:[],
-    description:"a very good consumer",
-    apiKey:"45333"
+    description:"",
+    apiKey:""
 }
 
 /*api_key
@@ -96,13 +110,16 @@ const user = createSlice({
             state.email = payload.email;
             state.quater = payload.quater
             state.city = payload.city;
-            state.profilePicture = payload.profilePhoto;
+            state.profilePicture = payload.profilePicture            ;
             state.role = payload.role;
             state.apiKey = payload.apiKey;
             state.description = payload.description;
         },
         updateUserId:(state, {payload}) => {
             state.userId = payload.userId
+        },
+        updateEmail:(state, {payload}) => {
+            state.email = payload.email
         },
         updateUserPref:(state, {payload}) => {
             state.userPref = payload.userPref;
@@ -113,6 +130,9 @@ const user = createSlice({
         updatePhoneNumber:(state, {payload}) => {
             state.email = payload.email;
         },
+        clearUser:(state) => {
+            state = initialState
+        }
     }
 });
 
@@ -121,7 +141,9 @@ export const {
     updateUserId,
     updateUserPref,
     updateDescription,
-    updatePhoneNumber
+    updatePhoneNumber,
+    clearUser,
+    updateEmail
 } = user.actions;
 
 export default user.reducer;
