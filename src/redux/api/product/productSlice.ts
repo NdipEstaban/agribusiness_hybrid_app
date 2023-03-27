@@ -1,9 +1,10 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import { encryptResponse } from '../../../utils/crypto_utility';
+import { hostAddress } from '../../../assets/constants/backend';
 
 const productSlice = createApi({
     reducerPath:"productApi",
-    baseQuery:fetchBaseQuery({baseUrl:"http://localhost:7000/products"}),
+    baseQuery:fetchBaseQuery({baseUrl:`${hostAddress}/products`}),
     tagTypes:['Product', 'MerchantProducts'],
     endpoints:(builder) => ({
         searchProduct:builder.query({

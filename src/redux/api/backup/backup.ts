@@ -1,10 +1,11 @@
 import {createApi, fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react";
 import { decryptRequest, encryptResponse } from "../../../utils/crypto_utility";
+import { hostAddress } from "../../../assets/constants/backend";
 
 
 const BackupSlice = createApi({
     reducerPath:"chatsBackupApi",
-    baseQuery:fetchBaseQuery({baseUrl:"http://localhost:7000/backup"}),
+    baseQuery:fetchBaseQuery({baseUrl:`${hostAddress}/backup`}),
     tagTypes:['OrdersPerMonth'],
     endpoints:(builder) => ({
         getUserData:builder.query({

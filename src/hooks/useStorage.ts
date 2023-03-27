@@ -72,7 +72,7 @@ export const useStorage = () => {
             setPendingOrders(storedPendingOrders);
 
             //getting user details
-            const userDetails = await store.get(USER_DETAILS_KEY) || {};
+            const userDetails = await store.get(USER_DETAILS_KEY) || {authed:false};
             setUserDetials(userDetails);
 
             //getting featured products
@@ -87,6 +87,7 @@ export const useStorage = () => {
     
     //Hooks for storage of users info
     const saveUserDetails = async(user:User) => {
+        console.log('saving user details', user);
         setUserDetials(user);
         await store?.set(USER_DETAILS_KEY, user);
     }
@@ -96,8 +97,8 @@ export const useStorage = () => {
     }
 
     const markAuthed = async() => {
-        let details = userDetails!;
-        console.log(`this is first ${details}`);
+        let details = await store?.get(USER_DETAILS_KEY);
+        console.log(`this is first`, details);
         details.authed = true;
         console.log(details);
         await store?.set(USER_DETAILS_KEY, details);

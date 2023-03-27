@@ -1,5 +1,5 @@
 {
-  "name": "agribusiness",
+  "name": "ionic-app-base",
   "integrations": {
     "capacitor": {}
   },

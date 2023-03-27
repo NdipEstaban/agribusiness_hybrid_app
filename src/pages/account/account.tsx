@@ -51,6 +51,7 @@ const inputHandler = (e:React.ChangeEvent<HTMLInputElement>,regex:RegExp, setVal
     }
 }
 
+
 const Account:React.FC = () => {
     const history = useHistory();
     const user = useAppSelector(state => state.user);
@@ -125,8 +126,8 @@ const Account:React.FC = () => {
             quality: 50,
             allowEditing: true,
             resultType: CameraResultType.DataUrl,
-          });
-          setModalImage(image.dataUrl);
+        });
+        setModalImage(image.dataUrl);
     }
 
     const handleUserPref = (e:any) => {
@@ -362,6 +363,7 @@ const Account:React.FC = () => {
                                 city={user.city}
                                 role={user.role}
                                 description={user.description}
+                                email={user.email}
                             />
                         </div>
                         <IonText>

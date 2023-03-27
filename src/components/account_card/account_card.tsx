@@ -52,11 +52,12 @@ const AccountCard:React.FC<AccountCardProps> = (props):JSX.Element => {
                 </IonText>
                 <IonText>
                     <FontAwesomeIcon icon={faMapLocation} />
-                    Cite de palmier carrefour express
+                    {props.quarter}
+                    
                 </IonText>
                 <IonText>
                     <FontAwesomeIcon icon={faMessage} />
-                    estabannd@gmail.com
+                    {props.email}
                 </IonText>
             </div>
                 {props.edit &&

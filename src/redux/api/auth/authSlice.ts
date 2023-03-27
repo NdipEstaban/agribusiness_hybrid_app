@@ -1,11 +1,12 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import { useSelector } from 'react-redux';
 import { encryptResponse, decryptRequest } from '../../../utils/crypto_utility';
+import { hostAddress } from '../../../assets/constants/backend';
 
 
 const authSlice = createApi({
     reducerPath: 'authApi',
-    baseQuery:fetchBaseQuery({baseUrl: "http://localhost:7000/auth"}),
+    baseQuery:fetchBaseQuery({baseUrl: `${hostAddress}/auth`}),
     tagTypes:['Auth'],
     endpoints: (builder) => ({
         signIn: builder.mutation({

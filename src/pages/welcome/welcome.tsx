@@ -14,7 +14,7 @@ const Welcome:React.FC = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgb(201, 201, 201)" fill-opacity="1" d="M0,288L80,245.3C160,203,320,117,480,117.3C640,117,800,203,960,234.7C1120,267,1280,245,1360,234.7L1440,224L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"></path></svg>
                    <div className='page-body'>
                         <IonRow className='welcome-text'>
-                            Welcome to ALRAYAN's agricbusiness platform!
+                            Welcome to ALRAYAN's agricbusiness platform! 
                             here you can sell your crops, buy crops and get delivered
                             to your doorstep or offer delivery services, agricbusiness is now online!
                             Are you ready to join us?

@@ -1,10 +1,11 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import { idCardSharp } from 'ionicons/icons';
 import { decryptRequest, encryptResponse } from '../../../utils/crypto_utility';
+import { hostAddress } from '../../../assets/constants/backend';
 
 const orderSlice = createApi({
     reducerPath:"orderApi",
-    baseQuery:fetchBaseQuery({baseUrl:"http://localhost:7000/orders"}),
+    baseQuery:fetchBaseQuery({baseUrl:`${hostAddress}/orders`}),
     tagTypes:['Order'],
     endpoints:(builder) => ({
         getConsumerOrders:builder.query({

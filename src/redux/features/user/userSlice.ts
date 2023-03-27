@@ -64,7 +64,7 @@ const initialState:User = {
     role:"",
     userPref:[],
     description:"",
-    apiKey:""
+    apiKey:"",
 }
 
 /*api_key
@@ -114,6 +114,8 @@ const user = createSlice({
             state.role = payload.role;
             state.apiKey = payload.apiKey;
             state.description = payload.description;
+
+            console.log(payload);
         },
         updateUserId:(state, {payload}) => {
             state.userId = payload.userId

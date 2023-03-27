@@ -1,10 +1,11 @@
 import {createApi, fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react";
 import { decryptRequest } from "../../../utils/crypto_utility";
+import { hostAddress } from "../../../assets/constants/backend";
 
 
 const StatsSlice = createApi({
     reducerPath:"statsApi",
-    baseQuery:fetchBaseQuery({baseUrl:"http://localhost:7000/stats"}),
+    baseQuery:fetchBaseQuery({baseUrl:`${hostAddress}/stats`}),
     tagTypes:['OrdersPerMonth'],
     endpoints:(builder) => ({
         getOrdersPerMonth:builder.query({

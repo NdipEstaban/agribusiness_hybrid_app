@@ -5,7 +5,7 @@ import './create_account.scss';
 import React, {RefObject, useRef, useState } from 'react';
 import cities from '../../assets/constants/cities';
 import products from '../../assets/constants/products';
-import {CameraResultType, Camera} from "@capacitor/camera"
+import {CameraResultType, Camera, CameraSource} from "@capacitor/camera"
 import { useAppDispatch, useAppSelector } from '../../hooks/redux_hooks';
 import { useSignInMutation, useSendOtpMutation, useLogInMutation } from '../../redux/api/auth/authSlice';
 import { useUpdateConsumerMutation, useUpdateMerchantMutation, useUpdateDeliveryMutation } from '../../redux/api/user/userSlice';
@@ -19,6 +19,9 @@ import { User, useStorage } from '../../hooks/useStorage';
 import { current } from '@reduxjs/toolkit';
 import { useLazyGetUserDataQuery } from '../../redux/api/backup/backup';
 import { useChatsStorage } from '../../hooks/useChatStorage';
+import ReactCrop, { Crop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+import ImageCropper from '../../components/imageCropper/imageCropper';
 
 
 let nameRegex = /^[a-zA-Z]{2,}\s[a-zA-Z]{2,}/;
@@ -51,13 +54,19 @@ type SignInLevel = 1 | 2 | 3 | 4 | 5 | 6;
 -> 5:selection of role
 -> 6:user prefferences
 */
+interface createAccountProps{
+    saveUserDetails:(user: User) => Promise<void>;
+    markAuthed:() => Promise<void>
+}
 
-export const CreateAccount:React.FC = () => {
+export const CreateAccount:React.FC<createAccountProps> = ({saveUserDetails, markAuthed}) => {
     const dispatch = useAppDispatch();
     const history = useHistory();
     const [presentAlert] = useIonAlert();
+    const imageCropperRef = useRef<HTMLDivElement>(null);
     const [presentLoader, dismissLoader] = useIonLoading();
-    const {saveUserDetails, markAuthed, restorePendingOrders} = useStorage();
+    // const {saveUserDetails, markAuthed, } = useStorage();
+    const {restorePendingOrders} = useStorage();
     const {restoreChatData} = useChatsStorage();
 
     const [signIn, {isLoading:signInLoading, isError:signInError, isSuccess:signInSuccess}] = useSignInMutation();
@@ -79,16 +88,16 @@ export const CreateAccount:React.FC = () => {
     /*Local state to hold the values entered by the user, each is an array containing the
     the user at index 0 and whether it's valid using a boolean at index 1*/
     
-    const [name, setName] = useState<Array<any>>([]);
-    const [email, setEmail] = useState<Array<any>>([]);
+    const [name, setName] = useState<Array<any>>(['']);
+    const [email, setEmail] = useState<Array<any>>(['']);
     const [role, setRole] = useState<string>('');
     const [city, setCity] = useState<string>('');
-    const [quater, setQuater] = useState<Array<any>>([]);
+    const [quater, setQuater] = useState<Array<any>>(['']);
     const [photo, setPhoto] = useState<string | undefined>('');
     const [userPref, setUserPref] = useState<Array<string>>([]);
     const [userExist, setUserExist] = useState<boolean>(false);
 
-    const [verifCode, setVerifCode] = useState<Array<any>>([]);
+    const [verifCode, setVerifCode] = useState<Array<any>>(['']);
 
     //Navigate between different levels of account creation
     const nextSignInLevel = () => {
@@ -128,10 +137,10 @@ export const CreateAccount:React.FC = () => {
 
     //fetch verification code, if number already exist in db, login into app else go through account creation
     const getVerificationCode = () => {
-        let emailAd = String(email[0]);
+        let emailAddress = String(email[0]);
 
         if(email[1] === true){
-            sendOtp(emailAd).then((result:any) => {
+            sendOtp(emailAddress).then((result:any) => {
                 const response = decryptRequest(result?.data);
                 console.log(response);
     
@@ -140,13 +149,13 @@ export const CreateAccount:React.FC = () => {
                         header: 'Oops, connection issues',
                         message: 'Could not send verification code please try again',
                         buttons: ['Try again'],
-                      })
+                    });
                 }else{
                     setSignInLevel(2);
-                }
+                } 
     
                 if(response?.emailExist === true){
-                    logIn(emailAd).then( (info:any) => {
+                    logIn(emailAddress).then( (info:any) => {
                         console.log(info);
                         let data = decryptRequest(info.data);
                         dispatch(updateUser(data));
@@ -187,16 +196,19 @@ export const CreateAccount:React.FC = () => {
     };
 
     //check verification code, if successful then move on to next level in account creation
-    const handleVerificatonCode = (e:any) => {
+    const handleVerificatonCode = async(e:any) => {
         let code = e.target.value;
         let data = decryptRequest(otp);
         console.log(data)
         if(code === data.otpCode){
             setVerifCode([verifCode, true]);
             //If user already has an account then move to home screen
-            if(userExist)history.push("/main");
+            // await markAuthed();
+            if(userExist){
+                await markAuthed();
+                history.push("/main");
+            };
             setSignInLevel(3);
-            markAuthed();
         }else{
             setVerifCode([verifCode, false]);
         }
@@ -204,12 +216,22 @@ export const CreateAccount:React.FC = () => {
 
     //prompt user to select photo either from gallery or camera
     const handlePhoto = async() => {
+        console.log('handling photo')
         const image = await Camera.getPhoto({
             quality: 90,
             allowEditing: true,
             resultType: CameraResultType.DataUrl,
-          });
-          setPhoto(image.dataUrl);
+            width:200,
+            height:200,
+        });
+        console.log('done handling photo');
+        setPhoto(image.dataUrl);
+        imageCropperRef.current!.style.display = 'flex';
+    }
+
+    const handlePhotoFromCropper = (image:string) => {
+        imageCropperRef.current!.style.display = 'none';
+        setPhoto(image);
     }
 
     //set userPrefference depending on the type of user, products for merchants and consumers and city for delivery
@@ -277,21 +299,6 @@ export const CreateAccount:React.FC = () => {
             description:"Edit your description",
         };
 
-        signIn(user).unwrap().then((result:any) => {
-            let data = decryptRequest(result);
-            user.userId = data?.userId;
-            user.apiKey = data?.apiKey;
-            dispatch(updateUser(user));
-            history.push("/main");
-            markAuthed();
-        }).catch(err => {
-            presentAlert({
-                header: 'Oops, no network connection',
-                message: 'Please turn on your network connection and try again',
-                buttons: ['Try again'],
-            });
-        });
-
         let userDetails:User = {
             quater:quater[0],
             userId:user.userId,
@@ -306,7 +313,23 @@ export const CreateAccount:React.FC = () => {
             authed:true,
         };
 
-        saveUserDetails(userDetails);
+        signIn(user).unwrap().then(async(result:any) => {
+            let data = decryptRequest(result);
+            user.userId = data?.userId;
+            userDetails.userId = data?.userId;
+            user.apiKey = data?.apiKey;
+            userDetails.apiKey = data?.apiKey
+            
+            await saveUserDetails(userDetails);
+            dispatch(updateUser(user));
+            history.push("/main");
+        }).catch(err => {
+            presentAlert({
+                header: 'Oops, no network connection',
+                message: 'Please turn on your network connection and try again',
+                buttons: ['Try again'],
+            });
+        });
     }
 
     //Display otp loader
@@ -420,12 +443,19 @@ export const CreateAccount:React.FC = () => {
                         (signInLevel === 4) && 
                         <React.Fragment>
                             <div className='add-pic-section'>
+                                {
+                                    (photo !== undefined && photo !== '') &&
+                                    <div  ref={imageCropperRef} className='image-cropper-util'>
+                                        <ImageCropper image={photo} aspect={1} width={300} height={300} submitImage={handlePhotoFromCropper}/>
+                                    </div>
+                                    
+                                }
                                 <div className='picture-wrapper'>
                                     {
-                                        photo === ''?
+                                        (photo === '' || photo === undefined)?
                                         <FontAwesomeIcon className='picture' icon={faImage}/>
                                         :
-                                        <img src={photo} className='picture' alt="user's profile" />
+                                        <img src={photo} className='picture' alt="user's profile"/>
                                     }
                                 </div>
                                 <h6 className='camera-btn' onClick={() => {handlePhoto()}}>Add a profile picture</h6>

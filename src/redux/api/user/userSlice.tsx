@@ -1,9 +1,10 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import { decryptRequest, encryptResponse } from '../../../utils/crypto_utility';
+import { hostAddress } from '../../../assets/constants/backend';
 
 const userSlice = createApi({
     reducerPath:"userApi",
-    baseQuery:fetchBaseQuery({baseUrl:"http://localhost:7000/users"}),
+    baseQuery:fetchBaseQuery({baseUrl:`${hostAddress}/users`}),
     tagTypes:['User'],
     endpoints:(builder) => ({
         searchUser:builder.query({

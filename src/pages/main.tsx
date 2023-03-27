@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Redirect, Route } from 'react-router-dom';
+import {App} from '@capacitor/app';
 import {
   IonApp,
   IonIcon,
@@ -30,21 +31,26 @@ import UserProfile from './user_profile/user_profile';
 import MyCommands from './my_commands/my_commands';
 
 import './main.scss';
-import { useStorage } from '../hooks/useStorage';
+import { User, useStorage } from '../hooks/useStorage';
 import { useAppDispatch, useAppSelector } from '../hooks/redux_hooks';
 import { useChatsStorage, messageItem } from '../hooks/useChatStorage';
 import { updateUser } from '../redux/features/user/userSlice';
+import { hostAddress } from '../assets/constants/backend';
 
-const socket = io.connect('http://localhost:7000');
+const socket = io.connect(`${hostAddress}`);
 
-const Main = () => {
+interface mainProps{
+  userDetails:User | undefined;
+}
+
+const Main:React.FC<mainProps> = ({userDetails}):JSX.Element => {
     const dispatch = useAppDispatch();
     //used to set the current user being chatted with
     const [currentChat, setCurrentChat] = useState<string | null>(null);
     const [presentLoader, dismissLoader] = useIonLoading();
     const [socketId, setSocketId] = useState<string>('')
     const {pendingOrders, deletePendingOrder, addPendingOrder, updatePendingOrdersProduct} = useStorage();
-    const {userDetails} = useStorage();
+    // const {userDetails} = useStorage();
     const {chats, setChatToRead, createChat, deleteChat, addMessage, deleteMessage, initStorage, markMessageAsSent, getUnsentMessages} = useChatsStorage();
     const user = useAppSelector(state => state.user);
 
@@ -108,9 +114,26 @@ const Main = () => {
     },[]);
 
     useEffect(() => {
-      if(userDetails !== undefined && userDetails !== null && user.userId !== userDetails.userId){
+      //first conditions is to handle undefined or null, second is to update only when there is a difference in userId
+      if((userDetails !== undefined && userDetails !== null) && user.userId !== userDetails.userId){
+        console.log('updated user');
         dispatch(updateUser(userDetails));
       }
+    });
+
+    useIonViewDidEnter(() => {
+
+      //handle exiting the app on mobile when user goes back
+      App.addListener('backButton', () => {
+        if(
+          window.location.pathname === '/main/home' || 
+          window.location.pathname === '/main/messaging' || 
+          window.location.pathname === '/main/orders' ||
+          window.location.pathname === '/main/account'
+        ){
+          App.exitApp();
+        }
+      });
     });
 
     return (
@@ -142,7 +165,7 @@ const Main = () => {
             <ChatPage getChatData={getChatData} createChat={createChat} addMessage={sendMessage} deleteMessage={deleteMessage} deleteChat={deleteChat} socket={socket} setCurrentChat={setCurrentUserChat} markReadChat={setChatToRead} addRecievedMessage={addMessage}/>
           </Route>
 
-          <Route path="/main/orders">
+          <Route path="/main/orders">e
             {
               user.role === 'consumer'?
               <Cart  deleteOrder={deletePendingOrder} updateOrder={updatePendingOrdersProduct} pendingOrders={pendingOrders}/>
