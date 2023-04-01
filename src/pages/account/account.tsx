@@ -465,7 +465,6 @@ const Account:React.FC = () => {
                                     :
                                     <img src={modalImage} className='picture' alt="user's profile" />
                                 }
-                                
                             </div>
                             <IonButton fill='clear' onClick={() => handleChangePhoto()}>
                                 change profile picture
