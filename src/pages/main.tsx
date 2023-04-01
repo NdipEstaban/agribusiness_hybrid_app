@@ -63,9 +63,9 @@ const Main:React.FC<mainProps> = ({userDetails}):JSX.Element => {
       await setCurrentChat(userId);
     }
 
-    useEffect(() => {
-      let language = navigator.
-    }, []);
+    // useEffect(() => {
+    //   let language = navigator.
+    // }, []);
 
     const sendMessage = async(userId:string, messageData:messageItem) => {
       await addMessage(userId, messageData);
