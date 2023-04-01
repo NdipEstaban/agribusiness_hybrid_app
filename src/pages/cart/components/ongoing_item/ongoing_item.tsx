@@ -9,6 +9,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faPlus, faAdd, faMinus, faBuilding, faTruck, faHome, faIndustry, faBuildingFlag, faShop, faBuildingNgo, faBuildingColumns, faShoppingBag} from '@fortawesome/free-solid-svg-icons';
 import ProductCartItem from '../product_item/product_item';
 import OrderProgress from '../order_progress/order_progress';
+import { v4 as uuid } from 'uuid';
+import { useAppSelector } from '../../../../hooks/redux_hooks';
 
 interface ongoingItemProps{
     merchantPhoto:string;
@@ -18,11 +20,21 @@ interface ongoingItemProps{
     progress:string;
     orderId:string;
     amountPaid:number;
+    socket:any;
 }
 
-const OngoingCartItem:React.FC<ongoingItemProps> = ({merchantName, merchantPhoto, date, products, progress, orderId, amountPaid}):JSX.Element => {
-    
-    const handleCompleteOrder = () => {}//
+const OngoingCartItem:React.FC<ongoingItemProps> = ({merchantName, merchantPhoto, date, products, progress, orderId, amountPaid, socket}):JSX.Element => {
+    const user = useAppSelector(state => state.user);
+    const handleCompleteOrder = () => {
+        let notification = {
+            id:uuid(),
+            source:user.name,
+            message:"Notified his order was recieved, payment successful",
+            timeDate:new Date()
+
+        }
+        socket.emit('consumer-confirm-order', {notification, orderId});
+    }
 
     return(
         <IonAccordion value={orderId} className='pending-item'>

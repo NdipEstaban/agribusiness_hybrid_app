@@ -446,7 +446,7 @@ export const CreateAccount:React.FC<createAccountProps> = ({saveUserDetails, mar
                                 {
                                     (photo !== undefined && photo !== '') &&
                                     <div  ref={imageCropperRef} className='image-cropper-util'>
-                                        <ImageCropper image={photo} aspect={1} width={300} height={300} submitImage={handlePhotoFromCropper}/>
+                                        <ImageCropper image={photo} aspect={1} submitImage={handlePhotoFromCropper}/>
                                     </div>
                                     
                                 }

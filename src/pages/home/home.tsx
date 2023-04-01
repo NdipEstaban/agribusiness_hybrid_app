@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import { Redirect, Route, useRouteMatch, useHistory} from 'react-router-dom';
 import { IonContent,IonText, IonBadge, IonRouterOutlet, IonTabs, IonTab, IonTabBar, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonTabButton, IonIcon, IonLabel } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -22,17 +22,26 @@ import { pendingOrderItem, useStorage } from "../../hooks/useStorage";
 
 interface HomeProps{
     addOrder:(params:any) => Promise<void>;
+    socket:any;
 }
 
-const Home:React.FC<HomeProps> = ({addOrder}):JSX.Element => {
+const Home:React.FC<HomeProps> = ({addOrder, socket}):JSX.Element => {
     const user = useAppSelector(state => state.user);
+    const [numberOfNewNotifications, setNumberOfNewNotifications] = useState<number>(1);
 
     const [currentHome, setCurrentHome] = React.useState('Featured');
     const history = useHistory();
 
     const goToNofifications = () => {
+        setNumberOfNewNotifications(0);
         history.push('/main/home/notifications');
     }
+
+    useEffect(() => {
+        socket.on("new-message", () => {
+            setNumberOfNewNotifications(current => current + 1);
+        });
+    }, [socket])
 
     
     return(
@@ -40,9 +49,9 @@ const Home:React.FC<HomeProps> = ({addOrder}):JSX.Element => {
             <IonHeader>
                 <IonToolbar> 
                     <IonTitle slot='start'>Home</IonTitle>
-                    <IonButton routerDirection="forward" routerLink="/main/home/notifications" id='notif-btn' slot='primary' fill='clear' color='primary' onClick={goToNofifications}>
+                    <IonButton routerDirection="forward" id='notif-btn' slot='primary' fill='clear' color='warning' onClick={goToNofifications}>
                         <FontAwesomeIcon icon={faBell}></FontAwesomeIcon>
-                        <IonBadge>1</IonBadge>
+                        {numberOfNewNotifications > 0 && <IonBadge color={'warning'}>{numberOfNewNotifications}</IonBadge>}
                     </IonButton>
                 </IonToolbar>
             </IonHeader>

@@ -40,9 +40,10 @@ const config = {
 interface pendingCartItem extends pendingOrderItem{
     deleteItem:(merchantId:string) => void,
     updateItem:(params:any) => Promise<void>,
+    socket:any,
 }
 
-const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, merchantPhoto, products, date, deleteItem, updateItem}):JSX.Element => {
+const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, merchantPhoto, products, date, deleteItem, updateItem, socket}):JSX.Element => {
     const consumer = useAppSelector((state:any) => state.user)
     const makeFlutterWavePayment = useFlutterwave(config);
     const [presentAlert] = useIonAlert();
@@ -90,6 +91,15 @@ const PendingCartItem:React.FC<pendingCartItem> = ({merchantId, merchantName, me
                         header:"Payment successful",
                         message:"Your order is on the way, check it's progress from the ongoing tab"
                     });
+                    socket.emit("consumer-pass-order", ({
+                        merchantId,
+                        message:{
+                            id:uuid(),
+                            source:consumer.name,
+                            notification:"Sent you an order request",
+                            timeDate:new Date(),
+                        }
+                    }));
                 }else{
                     presentAlert({
                         header:"Payment unsuccessful",

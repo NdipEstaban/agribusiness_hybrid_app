@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {IonAccordionGroup, IonList, IonModal, IonText, useIonLoading, useIonModal} from '@ionic/react';
+import {IonAccordionGroup, IonList, IonModal, IonText, useIonLoading, useIonModal, useIonViewWillEnter} from '@ionic/react';
 
 import './pending_commands.scss';
 
@@ -9,12 +9,14 @@ import PendingItem from '../../components/pending_item/pending_item';
 import { useAppSelector } from '../../../../hooks/redux_hooks';
 import { useLazyGetDeliveryPendingOrdersQuery, useLazyGetMerchantPendingOrdersQuery, useMerchantDeclineOrderMutation} from '../../../../redux/api/order/orderSlice';
 import { MutationTrigger } from '@reduxjs/toolkit/dist/query/react/buildHooks';
+import { v4 as uuid } from 'uuid';
 
 interface pendingCommandsProps{
     style:any;
+    socket:any;
 }
 
-const PendingCommands:React.FC<pendingCommandsProps> = ({style}):JSX.Element => {
+const PendingCommands:React.FC<pendingCommandsProps> = ({style, socket}):JSX.Element => {
     const modalRef = useRef<HTMLIonModalElement>(null);
     const user = useAppSelector(state => state.user);
 
@@ -35,7 +37,7 @@ const PendingCommands:React.FC<pendingCommandsProps> = ({style}):JSX.Element => 
         });
     }
 
-    const handleDeclinePendingOrder = async(orderId:string) => {
+    const handleDeclinePendingOrder = async(orderId:string, recipientId:string) => {
         let declineOrder:any = (user.role === 'merchant')?merchantDeclineOrder:() => {};
         let getOrders = (user.role === 'merchant')? getMerchantOrders:getDeliveryOrders;
         
@@ -46,6 +48,23 @@ const PendingCommands:React.FC<pendingCommandsProps> = ({style}):JSX.Element => 
 
         await declineOrder(orderId).unwrap().then(() => {
             console.log("deleted item");
+            if(user.role === 'merchant'){
+                let notification = {
+                    id:uuid(),
+                    source:user.name,
+                    message:"rejected your order request",
+                    timeDate:new Date()
+                }
+                socket.emit("merchant-reject-order", {notification, consumerId:recipientId});
+            }else{
+                let notification = {
+                    id:uuid(),
+                    source:user.name,
+                    message:"rejected your delivery request",
+                    timeDate:new Date()
+                }
+                socket.emit("delivery-reject-order", {notification, merchantId:recipientId});
+            }
             getOrders(user.userId).unwrap().then((data:any )=> {
                 console.log("fetched items");
                 setOrders(data);
@@ -54,13 +73,24 @@ const PendingCommands:React.FC<pendingCommandsProps> = ({style}):JSX.Element => 
         });
 
         fetchPendingCommands();
-
         dismissLoader();
     }
     
-    useEffect(() => {
+    useIonViewWillEnter(() => {
         fetchPendingCommands();
-    }, []);
+    });
+
+    useEffect(() => {
+        socket.on("consumer-pass-order", () => {
+            fetchPendingCommands();
+        });
+        socket.on("delivery-reject-order", () => {
+            fetchPendingCommands();
+        });
+        socket.on("delivery-accept-order", () => {
+            fetchPendingCommands();
+        });
+    }, [socket]);
 
     return(
         <IonList style={style} className='pending-commands-container'>
@@ -69,7 +99,7 @@ const PendingCommands:React.FC<pendingCommandsProps> = ({style}):JSX.Element => 
                 (orders.length < 1) && <IonText className="error-message">No Pending orders</IonText>
             }
             <IonAccordionGroup>
-                        <PendingItem
+                        {/* <PendingItem
                             key={1} 
                             orderId={"1"}
                             customerName={"Ndip Estaban"}
@@ -81,12 +111,14 @@ const PendingCommands:React.FC<pendingCommandsProps> = ({style}):JSX.Element => 
                             deleteOrder={handleDeclinePendingOrder}
                             updatePendingCommands={fetchPendingCommands}
                             date={"2023-02-18 19:40:44"}
-                        />
+                            custommerId={'332'}
+                        /> */}
                 {
                     orders.map((order:any) =>
                         <PendingItem
                             key={order.orderId} 
                             orderId={order.orderId}
+                            customerId={order.customerId}
                             customerName={order.customerName}
                             customerImage={order.customerImage}
                             deliveryLocation={order.deliveryLocation}
@@ -96,6 +128,7 @@ const PendingCommands:React.FC<pendingCommandsProps> = ({style}):JSX.Element => 
                             deleteOrder={handleDeclinePendingOrder}
                             updatePendingCommands={fetchPendingCommands}
                             date={order.date}
+                            socket={socket}
                         />
                     )
                 }

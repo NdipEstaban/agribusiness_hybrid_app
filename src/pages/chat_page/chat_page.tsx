@@ -213,7 +213,7 @@ const ChatPage:React.FC<chatPageProps> = ({getChatData, createChat, addMessage, 
             }
         });
 
-        socket.on('user-came-offline', async(userId:string) => {
+        socket.on('user-came-online', async(userId:string) => {
             if(userId === params.id){
                 setUserOnline(true);
             }

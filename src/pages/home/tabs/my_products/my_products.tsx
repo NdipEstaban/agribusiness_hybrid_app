@@ -13,6 +13,7 @@ import tomatoes from '../../../../assets/images/tomatoes.png';
 import './my_products.scss';
 import { useCreateNewProductMutation, useGetMerchantProductsQuery } from '../../../../redux/api/product/productSlice';
 import { useAppSelector } from '../../../../hooks/redux_hooks';
+import ImageCropper from '../../../../components/imageCropper/imageCropper';
 
 interface productProps{
     style:any;
@@ -22,6 +23,8 @@ const MyProducts:React.FC<productProps> = (props):JSX.Element => {
     const [createNewProduct, {isLoading:creatingProduct, isError:productNotCreated, isSuccess:productCreated}] = useCreateNewProductMutation();
     const [presentAlert] = useIonAlert();
     const [presentLoader, dismissLoader] = useIonLoading();
+
+    const imageCropperRef = useRef<HTMLDivElement>(null);
 
     const merchantId = useAppSelector((state:any) => state.user.userId);
     const [productName, setProductName] = useState<string | undefined>(undefined);
@@ -41,6 +44,12 @@ const MyProducts:React.FC<productProps> = (props):JSX.Element => {
             promptLabelHeader:"Square images are preffered"
         });
         setProductPhoto(image.dataUrl);
+        imageCropperRef.current!.style.display = 'flex';
+    }
+
+    const handleCroppedImage = (image:string) => {
+        imageCropperRef.current!.style.display = 'none';
+        setProductPhoto(image);
     }
 
     const addProductModal = useRef<HTMLIonModalElement>(null);
@@ -158,6 +167,9 @@ const MyProducts:React.FC<productProps> = (props):JSX.Element => {
                             } 
                         </div>
                         <h5 className='add-image-text' onClick={() => handlePhoto()}>Add products picture</h5>
+                    </div>
+                    <div className='image-cropper-product-util' ref={imageCropperRef}>
+                        <ImageCropper aspect={1} submitImage={handleCroppedImage} image={productPhoto} />
                     </div>
                     <form className='add__products__modal-form'>
                         <label>

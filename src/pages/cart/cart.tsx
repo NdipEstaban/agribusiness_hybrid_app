@@ -13,23 +13,53 @@ import OngoingCartItem from './components/ongoing_item/ongoing_item';
 import { pendingOrderItem, useStorage } from '../../hooks/useStorage';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux_hooks';
 import { updatePendingOrders } from '../../redux/features/cart/cartSlice';
-import { useGetConsumerOrdersQuery } from '../../redux/api/order/orderSlice';
+import { useGetConsumerOrdersQuery, useLazyGetConsumerOrdersQuery } from '../../redux/api/order/orderSlice';
 import { decryptRequest } from '../../utils/crypto_utility';
 
 interface cartProps{
     deleteOrder:(params:any) => Promise<void>;
     updateOrder:(params:any) => Promise<void>;
     pendingOrders:pendingOrderItem[];
+    socket:any;
 }
 
-const Cart:React.FC<cartProps> = ({deleteOrder, pendingOrders, updateOrder}):JSX.Element => {
+const Cart:React.FC<cartProps> = ({deleteOrder, pendingOrders, updateOrder, socket}):JSX.Element => {
     const [presentLoader, dismissLoader] = useIonLoading();
     const [presentAlert, dissmissLoader] = useIonAlert();
 
     const consumer = useAppSelector(state => state.user)
     const [currentView, setCurrentView] = useState<string>("Pending");
 
-    const {data:consumerOrders, isLoading, isError,} = useGetConsumerOrdersQuery(consumer.userId);
+    const [getConsumerOrders, {isLoading, isError}] = useLazyGetConsumerOrdersQuery();
+    const [consumerOrders, setConsumerOrders] = useState([]);
+
+    // const {data:consumerOrders, isLoading, isError,} = useGetConsumerOrdersQuery(consumer.userId);
+
+    useEffect(() => {
+        socket.on("delivery-notify-consumer", (details:any) => {
+            getConsumerOrders(consumer.userId).unwrap().then(data => {
+                setConsumerOrders(data);
+            });
+        });
+
+        socket.on("merchant-acept-order", (details:any) => {
+            getConsumerOrders(consumer.userId).unwrap().then(data => {
+                setConsumerOrders(data);
+            });
+        });
+
+        socket.on("merchant-reject-order", (details:any) => {
+            getConsumerOrders(consumer.userId).unwrap().then(data => {
+                setConsumerOrders(data);
+            });
+        });
+    },[socket]);
+
+    useIonViewWillEnter(() => {
+        getConsumerOrders(consumer.userId).unwrap().then(data => {
+            setConsumerOrders(data);
+        })
+    });
 
     return(
         <IonPage>
@@ -69,6 +99,7 @@ const Cart:React.FC<cartProps> = ({deleteOrder, pendingOrders, updateOrder}):JSX
                                         progress={order.progress}
                                         orderId={order.orderId}
                                         amountPaid={order.amountPaid}
+                                        socket={socket}
                                     />
                                 )
                             }
@@ -88,6 +119,7 @@ const Cart:React.FC<cartProps> = ({deleteOrder, pendingOrders, updateOrder}):JSX
                                 products={order.products}
                                 deleteItem={deleteOrder}
                                 updateItem={updateOrder}
+                                socket={socket}
                             />
                         )}
                     </IonAccordionGroup>

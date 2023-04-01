@@ -4,14 +4,12 @@ import "cropperjs/dist/cropper.css";
 import './imageCropper.scss';
 
 interface imageCropperProps{
-    width:number;
-    height:number;
     aspect:number;
     image:any;
     submitImage:(image:string) => void;
 }
 
-const ImageCropper:React.FC<imageCropperProps> = ({width, height, aspect, image, submitImage}):JSX.Element => {
+const ImageCropper:React.FC<imageCropperProps> = ({aspect, image, submitImage}):JSX.Element => {
   const [croppedImage, setCroppedImage] = useState<string>();
 
   const handleSubmit = () => {
@@ -45,7 +43,7 @@ const ImageCropper:React.FC<imageCropperProps> = ({width, height, aspect, image,
         minCropBoxHeight={100}
       />
       <button type='button' className='submit-image-btn' onClick={() => handleSubmit()}>
-        Add Image
+        Submit Image
       </button>
     </div>
     

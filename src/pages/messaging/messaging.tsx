@@ -136,7 +136,7 @@ const Messaging:React.FC<messagingProps> = ({chats, deleteChat, activateUser, so
                 </IonHeader>
                 <IonContent>
                     <IonList>
-                        {searchedUsers.length < 1 && <h6>Search a name to start a new chat</h6>}
+                        {searchedUsers.length < 1 && <h6 style={{marginLeft:"10px"}} >Search for a person you wish to chat with</h6>}
                         {
                             searchedUsers.map((user:any) => 
                                 <IonItem className='user__account_item' onClick={() => openNewChat(user.user_id)}>

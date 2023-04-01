@@ -109,6 +109,31 @@
             width:90%;
             align-self: center;
             padding:0.5rem;
+            position:relative;
+
+            .delivery-alert-button{
+                position:absolute;
+                right:1%;
+                top:50%;
+                transform:translateY(-50%);
+                width:7rem;
+                height:3rem;
+                font-weight: bold;
+                padding:0.5rem 0.1rem;
+                background:#3c7aff;
+                color:white;
+                border-radius:30px;
+            }
+
+            .delivery-alert-button:hover{
+                background:#6193ff;
+                color:rgb(247, 247, 247);
+                box-shadow:2px 2px 10px grey;
+            }
+
+            .delivery-alert-button:active{
+                box-shadow:none;
+            }
         }
     }
 }

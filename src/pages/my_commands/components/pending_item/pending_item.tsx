@@ -10,6 +10,7 @@ import { useAddDeliveryPaymentMutation, useDeliveryAceptOrderMutation, useDelive
 import { useLazyGetDeliveryServicesQuery } from '../../../../redux/api/user/userSlice';
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { useAppSelector } from '../../../../hooks/redux_hooks';
+import { v4 as uuid } from 'uuid';
 
 let presentDate:string = new Date().toLocaleDateString();
  
@@ -34,18 +35,20 @@ const config = {
 
 interface pendingItemProps{
     orderId:string,
+    customerId:string,
     customerName:string,
     amountPaid:number,
     customerImage:string,
     deliveryLocation:string,
     customerProducts:any[],
     merchantLocation?:string,
-    deleteOrder:(param:string) => Promise<void>,
+    deleteOrder:(orderId:string, recipientId:string) => Promise<void>,
     updatePendingCommands:() => void,
     date:string,
+    socket:any;
 }
 
-const PendingItem:React.FC<pendingItemProps> = ({orderId, customerImage, customerName, deliveryLocation, merchantLocation, amountPaid, customerProducts, deleteOrder, updatePendingCommands, date}):JSX.Element => {
+const PendingItem:React.FC<pendingItemProps> = ({orderId, customerId, customerImage, customerName, deliveryLocation, merchantLocation, amountPaid, customerProducts, deleteOrder, updatePendingCommands, date, socket}):JSX.Element => {
     const user = useAppSelector(state => state.user);
     const [presentAlert, dismissAlert] = useIonAlert();
     const [presentLoader, dismissLoader] = useIonLoading();
@@ -71,10 +74,19 @@ const PendingItem:React.FC<pendingItemProps> = ({orderId, customerImage, custome
     }
 
     const handleDeliveryInPerson = () => {
+        let notification = {
+            id:uuid(),
+            source:user.name,
+            message:"Acepted your delivery order & is on the way to collect package",
+            timeDate:new Date()
+        }
         merchantSelfDelivery(orderId).unwrap()
-        .then((data) => presentToast({
-            message:"Your client is informed, dont' keep him waiting for long"
-        }));
+        .then((data) => {
+            presentToast({
+                message:"Your client is informed, don't keep him waiting for long"
+            });
+            socket.emit("merchant-accept-order", {notification, customerId});
+        });
     }
 
     const handleDeliveryAceptOrder = () => {
@@ -90,6 +102,13 @@ const PendingItem:React.FC<pendingItemProps> = ({orderId, customerImage, custome
                 message:"Order added to ongoing orders",
                 duration:3000
             });
+            let notification = {
+                id:uuid(),
+                source:user.name,
+                message:"Acepted your delivery order & is on the way to collect package",
+                timeDate:new Date()
+            }
+            socket.emit("delivery-accept-order", {merchantId:customerId, notification})
             updatePendingCommands();
         })
         .catch(err => {
@@ -126,7 +145,7 @@ const PendingItem:React.FC<pendingItemProps> = ({orderId, customerImage, custome
                 });
             });
         }else{
-            deleteOrder(orderId);
+            deleteOrder(orderId, customerId);
         }
 
         setLoading(false);
@@ -152,6 +171,7 @@ const PendingItem:React.FC<pendingItemProps> = ({orderId, customerImage, custome
                         header:"Payment successful",
                         message:"Your order is on the way, check it's progress from the ongoing tab"
                     });
+                    socket.emit("merchant-send-delivery-order")
                 }else{
                     presentAlert({
                         header:"Payment unsuccessful",

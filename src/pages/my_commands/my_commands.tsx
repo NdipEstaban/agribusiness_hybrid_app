@@ -13,7 +13,11 @@ import PendingItem from './components/pending_item/pending_item';
 
 import CompletedCommands from './tabs/completed_commands/completed_commands';
 import PendingCommands from './tabs/pending_commands/pending_commands';
-const MyCommands:React.FC = () => {
+interface myCommandsProps{
+    socket:any;
+}
+
+const MyCommands:React.FC<myCommandsProps> = ({socket}) => {
 
     const [currentTab, setCurrentTab] = React.useState('Pending');
 
@@ -24,9 +28,6 @@ const MyCommands:React.FC = () => {
                     <IonTitle>
                         My Orders
                     </IonTitle>
-                    <IonButton slot='end' fill='clear'>
-                        <FontAwesomeIcon icon={faSortAlphaDownAlt} />
-                    </IonButton>
                 </IonToolbar>
             </IonHeader>
             <IonContent>
@@ -34,8 +35,8 @@ const MyCommands:React.FC = () => {
                     <div className='commands-radio-btn'>
                         <RadioButton option1='Pending' option2='Ongoing' setHome={setCurrentTab} />
                     </div>
-                    <PendingCommands style={(currentTab !== "Pending")?{display:"none"}:{}} />
-                    <CompletedCommands style={(currentTab !== "Ongoing")?{display:"none"}:{}} />
+                    <PendingCommands socket={socket} style={(currentTab !== "Pending")?{display:"none"}:{}} />
+                    <CompletedCommands socket={socket} style={(currentTab !== "Ongoing")?{display:"none"}:{}} />
                     {/* {currentTab === 'Pending'?<PendingCommands />:<CompletedCommands />} */}
                 </div>
             </IonContent>

@@ -63,7 +63,7 @@ const Main:React.FC<mainProps> = ({userDetails}):JSX.Element => {
       await setCurrentChat(userId);
     }
 
-    useEffect(() => console.log(currentChat), [currentChat])
+    useEffect(() => console.log(currentChat), [currentChat]);
 
     const sendMessage = async(userId:string, messageData:messageItem) => {
       await addMessage(userId, messageData);
@@ -144,17 +144,17 @@ const Main:React.FC<mainProps> = ({userDetails}):JSX.Element => {
           {/*Defining the home tab route and nested routes */}
 
           <Route exact path="/main/home">
-            <Home addOrder={addPendingOrder}/>
+            <Home addOrder={addPendingOrder} socket={socket}/>
           </Route>
           <Route exact path="/main/home/notifications">
-            <Notifications />
+            <Notifications socket={socket}/>
           </Route>
 
           <Route exact path="/main/search">
-            <Search />
+            <Search/>
           </Route>
           <Route exact path="/main/account-details/:id">
-            <UserProfile/>
+            <UserProfile />
           </Route>
  
           {/*Defining the messaging tab route and nested routes*/}
@@ -165,12 +165,12 @@ const Main:React.FC<mainProps> = ({userDetails}):JSX.Element => {
             <ChatPage getChatData={getChatData} createChat={createChat} addMessage={sendMessage} deleteMessage={deleteMessage} deleteChat={deleteChat} socket={socket} setCurrentChat={setCurrentUserChat} markReadChat={setChatToRead} addRecievedMessage={addMessage}/>
           </Route>
 
-          <Route path="/main/orders">e
+          <Route path="/main/orders">
             {
               user.role === 'consumer'?
-              <Cart  deleteOrder={deletePendingOrder} updateOrder={updatePendingOrdersProduct} pendingOrders={pendingOrders}/>
+              <Cart socket={socket} deleteOrder={deletePendingOrder} updateOrder={updatePendingOrdersProduct} pendingOrders={pendingOrders}/>
               :
-              <MyCommands />
+              <MyCommands socket={socket}/>
             }
           </Route>
           <Route exact path="/main/account/">

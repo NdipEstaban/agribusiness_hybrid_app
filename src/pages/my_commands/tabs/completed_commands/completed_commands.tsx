@@ -8,20 +8,36 @@ import { useLazyGetDeliveryOngoingOrdersQuery, useLazyGetMerchantOngoingOrdersQu
 
 interface completedCommandsProps{
     style:any;
+    socket:any;
 }
 
-const CompletedCommands:React.FC<completedCommandsProps> = ({style}):JSX.Element => {
+const CompletedCommands:React.FC<completedCommandsProps> = ({style, socket}):JSX.Element => {
     let user = useAppSelector(state => state.user);
     const [orders, setOrders] = useState<Array<any>>([]);
 
     const [getMerchantOngoingOrders] = useLazyGetMerchantOngoingOrdersQuery();
     const [getDeliveryOngoingOrders] = useLazyGetDeliveryOngoingOrdersQuery();
+    let getOrders = user.role === 'merchant'?getMerchantOngoingOrders:getDeliveryOngoingOrders;
 
     useEffect(() => {
-        let getOrders = user.role === 'merchant'?getMerchantOngoingOrders:getDeliveryOngoingOrders;
         getOrders(user.userId).unwrap()
         .then((data) => setOrders(data));
     }, []);
+
+    useEffect(() => {
+        socket.on('consumer-confirm-order', (data:any) => {
+            getOrders(user.userId).unwrap()
+            .then((data) => setOrders(data));
+        });
+        socket.on("delivery-reject-order", () => {
+            getOrders(user.userId).unwrap()
+            .then((data) => setOrders(data));
+        });
+        socket.on("delivery-accept-order", () => {
+            getOrders(user.userId).unwrap()
+            .then((data) => setOrders(data));
+        })
+    }, [socket]);
 
     return(
         <IonList style={style} className='ongoing-commands-container'>
@@ -37,6 +53,7 @@ const CompletedCommands:React.FC<completedCommandsProps> = ({style}):JSX.Element
                                 <CompletedItem 
                                     key={order.orderId}
                                     orderId={order.orderId}
+                                    consumerId={order.consumerId}
                                     consumerName={order.consumerName}
                                     consumerPhoto={order.consumerImage}
                                     amount={order.amount}
@@ -61,6 +78,8 @@ const CompletedCommands:React.FC<completedCommandsProps> = ({style}):JSX.Element
                                     clientPhoto={order.customerImage}
                                     clientName={order.customerName}
                                     date={order.date}
+                                    socket={socket}
+                                    consumerId={order.customerId}
                                 />
                             );
                         }

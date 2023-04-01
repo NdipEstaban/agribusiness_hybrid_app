@@ -29,6 +29,7 @@ import { useBackupUserDataMutation } from '../../redux/api/backup/backup';
 import { useSendOtpMutation } from '../../redux/api/auth/authSlice';
 import { decryptRequest } from '../../utils/crypto_utility';
 import { trendingUpOutline } from 'ionicons/icons';
+import ImageCropper from '../../components/imageCropper/imageCropper';
 
 let ratesPrices:number[] = [];
 for(let i = 1000; i <= 50000; i+= 500){
@@ -63,6 +64,7 @@ const Account:React.FC = () => {
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef(null);
     const emailRef = useRef<HTMLInputElement>(null);
+    const imageCropperRef = useRef<HTMLDivElement>(null);
 
     
     const verifCodeRef = useRef<HTMLInputElement>(null);
@@ -128,6 +130,12 @@ const Account:React.FC = () => {
             resultType: CameraResultType.DataUrl,
         });
         setModalImage(image.dataUrl);
+        imageCropperRef.current!.style.display = 'flex';
+    }
+
+    const handleCroppedImage = (image:string) => {
+        imageCropperRef.current!.style.display = 'none';
+        setModalImage(image);
     }
 
     const handleUserPref = (e:any) => {
@@ -462,6 +470,9 @@ const Account:React.FC = () => {
                             <IonButton fill='clear' onClick={() => handleChangePhoto()}>
                                 change profile picture
                             </IonButton>
+                        </div>
+                        <div className='image-cropper-account-util' ref={imageCropperRef}>
+                            <ImageCropper image={modalImage} aspect={1} submitImage={handleCroppedImage} />
                         </div>
                         <IonList>
                             <label className='create__account-label'>
