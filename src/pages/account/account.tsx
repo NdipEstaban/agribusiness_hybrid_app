@@ -247,7 +247,7 @@ const Account:React.FC = () => {
 
         updateUserInfo(userDetails).unwrap().then((data) => {
             presentToast({
-                message:'details successfully updated',
+                message:'Some fields have not been filled properly',
                 duration:1500
             });
 
@@ -394,6 +394,7 @@ const Account:React.FC = () => {
                                     );
                                 })
                             }
+                            {recentOrders?.length <= 0 && <h6>No recent orders yet</h6>}
                         </IonList>
                         {/*Edit account form*/}
                         <div className='most-popular most-popular-product-section'>
@@ -417,28 +418,30 @@ const Account:React.FC = () => {
                                         </IonItem>
                                     )
                                 }
+                                {mostOrderedProducts?.length <= 0 && <h6>No products ordered yet</h6>}
                             </IonList>
                         </div>
                         {
                             user.role !== 'consumer' && 
                             <div className='most-popular most-popular-user-section'>
-                            <h3>My most frequent {user.role === 'merchant'?"Clients": "Merchants"}</h3>
-                            <IonList>
-                                <IonItem>
-                                    <IonAvatar>
-                                        <img src={tomatoes} alt=''/>
-                                    </IonAvatar>
-                                    <div className='user-name'>
-                                        <IonText>
-                                            John summerset
-                                        </IonText>
-                                    </div>
-                                    <div>
-                                        20 orders
-                                    </div>
-                                </IonItem>
-                            </IonList>
-                        </div>
+                                <h3>My most frequent {user.role === 'merchant'?"Clients": "Merchants"}</h3>
+                                <IonList>
+                                    <IonItem>
+                                        <IonAvatar>
+                                            <img src={tomatoes} alt=''/>
+                                        </IonAvatar>
+                                        <div className='user-name'>
+                                            <IonText>
+                                                John summerset
+                                            </IonText>
+                                        </div>
+                                        <div>
+                                            20 orders
+                                        </div>
+                                    </IonItem>
+                                </IonList>
+                                
+                            </div>
                         }
                     </section>
                     <section className='charts-section'>

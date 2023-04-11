@@ -101,7 +101,7 @@ const Featured:React.FC<featuredProps> = (props):JSX.Element => {
                             }                
                     </IonList>
                     :
-                    <h3>Oops, no internet connection</h3>
+                    <h3>No products for now</h3>
                 }
                 
                 <IonInfiniteScroll

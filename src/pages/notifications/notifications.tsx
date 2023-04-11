@@ -56,10 +56,8 @@ const Notifications:React.FC<notificationProps> = ({socket}) => {
             </IonHeader>
             <IonContent>
                 {
-                    notifications.length > -1?
+                    notifications.length > 0?
                     <IonList lines='none' className="notification-list">
-                        <NotificationItem notification={tempNotificationItem} deleteNotification={deleteNotification} />
-                        <NotificationItem notification={tempNotificationItem} deleteNotification={deleteNotification} />
                         {
                             notifications.map(item => (
                                 <NotificationItem notification={item} deleteNotification={deleteNotification} />

@@ -66,9 +66,6 @@ const Cart:React.FC<cartProps> = ({deleteOrder, pendingOrders, updateOrder, sock
             <IonHeader>
                 <IonToolbar>
                     <IonTitle>Cart</IonTitle>
-                    <IonButton slot='end' fill='clear'>
-                        <FontAwesomeIcon icon={faTasks} />
-                    </IonButton>
                 </IonToolbar>
             </IonHeader>
             <IonContent>
@@ -103,6 +100,7 @@ const Cart:React.FC<cartProps> = ({deleteOrder, pendingOrders, updateOrder, sock
                                     />
                                 )
                             }
+                            {consumerOrders.length <= 0 && <h6>No orders, pass order from a list of your pending orders</h6>}
                         </IonAccordionGroup>
                     }
 
@@ -122,7 +120,9 @@ const Cart:React.FC<cartProps> = ({deleteOrder, pendingOrders, updateOrder, sock
                                 socket={socket}
                             />
                         )}
+                        {pendingOrders.length <= 0 && <h6>No items in the cart go do some shopping</h6>}
                     </IonAccordionGroup>
+                    
                 </div>
             </IonContent>
         </IonPage>

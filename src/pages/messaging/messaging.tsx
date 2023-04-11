@@ -1,7 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import { IonPage,IonButton,IonList, IonHeader, IonToolbar, IonTitle, IonContent, IonFabButton, IonFab, IonModal, IonSearchbar, IonText, IonItem, useIonViewWillLeave, IonItemSliding, IonItemOptions, IonItemOption, IonIcon, useIonViewWillEnter } from '@ionic/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeftLong, faMessage, faPlus, faTasks } from '@fortawesome/free-solid-svg-icons';
+import companyLogo from '../../assets/images/abic_logo.png';
 
 import MessageChat from './components/message_chat/message_chat';
 
@@ -28,6 +29,7 @@ const Messaging:React.FC<messagingProps> = ({chats, deleteChat, activateUser, so
     const [searchedUsers, setSearchedUsers] = useState<Array<any>>([]);
     const [searchUsers] = useLazySearchUserQuery();
     const [getUserInfo] = useGetUserByIdMutation();
+    const adminChat = useMemo(() => chats.find(i => i.userId === 'admin'), [chats])
 
     const handleSearchBar = (ev:Event) => {
         let query:string = '';
@@ -86,9 +88,6 @@ const Messaging:React.FC<messagingProps> = ({chats, deleteChat, activateUser, so
                     <IonTitle>
                         Messages
                     </IonTitle>
-                    <IonButton fill='clear' slot='primary' color='none'>
-                        <FontAwesomeIcon icon={faTasks} />
-                    </IonButton>
                 </IonToolbar>
             </IonHeader>
             <IonContent>
@@ -99,23 +98,37 @@ const Messaging:React.FC<messagingProps> = ({chats, deleteChat, activateUser, so
                 </IonFab>
                 
                 <IonList lines='none'>
+                    <MessageChat
+                        userId={'admin'}
+                        name={"ABIC Customer Care"}
+                        image={companyLogo}
+                        messages={adminChat!.messages}
+                    />
                     {
-                        chats?.filter((item:chatItem) => item.messages.length > 0).map(chat => 
-                            <IonItemSliding key={chat.userId}>
-                                <MessageChat
-                                    userId={chat.userId}
-                                    name={chat.name}
-                                    image={chat.image}
-                                    messages={chat.messages}
-                                />
-                                <IonItemOptions>
-                                    <IonItemOption color="danger" onClick={() => deleteChat(chat.userId)}>
-                                        Delete
-                                    </IonItemOption>
-                                </IonItemOptions>
-                            </IonItemSliding>
-                            
-                        )
+                        chats?.filter((item:chatItem) => item.messages.length > 0).length <= 0 &&
+                        <h6>No chats, click on the <FontAwesomeIcon icon={faMessage} /> button to start a new chat</h6>
+                    }
+                    {
+                        chats?.filter((item:chatItem) => item.messages.length > 0).map(chat => {
+                            if(chat.userId !== 'admin'){
+                                return(
+                                    <IonItemSliding key={chat.userId}>
+                                        <MessageChat
+                                            userId={chat.userId}
+                                            name={chat.name}
+                                            image={chat.image}
+                                            messages={chat.messages}
+                                        />
+                                        <IonItemOptions>
+                                            <IonItemOption color="danger" onClick={() => deleteChat(chat.userId)}>
+                                                Delete
+                                            </IonItemOption>
+                                        </IonItemOptions>
+                                    </IonItemSliding>
+                                ) 
+                            }
+                            return ''
+                        })
                     }
                 </IonList>
             </IonContent>

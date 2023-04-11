@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import {IonPage,useIonViewWillEnter, useIonViewWillLeave, IonList, IonTitle,IonText,IonTextarea,IonHeader, IonToolbar, IonAvatar, IonImg, IonContent, IonLabel, IonInput, IonButton, IonModal, IonVirtualScroll, useIonToast,} from '@ionic/react';
 
 import './chat_page.scss';
+import companyLogo from '../../assets/images/abic_logo.png';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowLeftLong, faFileImage, faImage, faPaperclip, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -106,6 +107,7 @@ interface chatPageProps{
 const ChatPage:React.FC<chatPageProps> = ({getChatData, createChat, addMessage, deleteMessage, deleteChat, socket, setCurrentChat, markReadChat, addRecievedMessage}):JSX.Element => {
     const user = useAppSelector(state => state.user);
     const params:{id:string} = useParams();
+    console.log(params.id);
     const [presentToast] = useIonToast();
     const messagesContainer = useRef<null | HTMLDivElement>(null);
     const [fetchUserData] = useGetUserByIdMutation();
@@ -186,19 +188,30 @@ const ChatPage:React.FC<chatPageProps> = ({getChatData, createChat, addMessage, 
     useEffect(() => {
         socket.on('recieve-message', async(data:any) => {
             let {sender, messageData} = data;
-            fetchUserData(params.id).unwrap().then(async(data:any) => {
-                console.clear();
-                if(sender === data.user_id){
-                    let userInfo = {
-                        name:data.name,
-                        image:data.profile_picture
-                    }
-                    console.log('currenttly chatting with');
-                    await addRecievedMessage(sender, messageData, userInfo)
-                    await markReadChat(data.user_id);
-                    socket.emit('user-read-messages', {reciever:data.user_id, sender:user.userId});
+            if(params.id === 'admin'){
+                let userInfo = {
+                    name:'',//admin chat is always present so no need to add data
+                    image:'',
                 }
-            })
+                await addRecievedMessage(sender, messageData, userInfo)
+                await markReadChat('admin');
+                socket.emit('user-read-messages', {reciever:'admin', sender:user.userId});
+            }else{
+                fetchUserData(params.id).unwrap().then(async(data:any) => {
+                    console.clear();
+                    if(sender === data.user_id){
+                        let userInfo = {
+                            name:data.name,
+                            image:data.profile_picture
+                        }
+                        console.log('currenttly chatting with');
+                        await addRecievedMessage(sender, messageData, userInfo)
+                        await markReadChat(data.user_id);
+                        socket.emit('user-read-messages', {reciever:data.user_id, sender:user.userId});
+                    }
+                })
+            }
+            
         });
 
         socket.on('chats-read', async(data:any) => {
@@ -230,7 +243,6 @@ const ChatPage:React.FC<chatPageProps> = ({getChatData, createChat, addMessage, 
     }, [socket])
 
     const sendMessage = async() => {
-        console.log(messages);
         //creating the message object
         let today = new Date();
         let newMessage = {
@@ -257,12 +269,22 @@ const ChatPage:React.FC<chatPageProps> = ({getChatData, createChat, addMessage, 
             });
         }
 
-        await addMessage(recipientInfo.userId, newMessage);
-        let chat = getChatData(params.id);
-        if(chat !== null && chat !== undefined){
-            setMessages(chat!.messages);
-            setOpenImageModal(false);
-            console.log('not creating chat');
+        if(params.id === 'admin'){
+            await addMessage('admin', newMessage);
+            let chat = getChatData(params.id);
+            if(chat !== null && chat !== undefined){
+                setMessages(chat!.messages);
+                setOpenImageModal(false);
+                console.log('not creating chat');
+            }
+        }else{
+            await addMessage(recipientInfo.userId, newMessage);
+            let chat = getChatData(params.id);
+            if(chat !== null && chat !== undefined){
+                setMessages(chat!.messages);
+                setOpenImageModal(false);
+                console.log('not creating chat');
+            }
         }
     }
 
@@ -295,11 +317,11 @@ const ChatPage:React.FC<chatPageProps> = ({getChatData, createChat, addMessage, 
                         <FontAwesomeIcon icon={faArrowLeft} />
                     </IonButton>
                     <IonAvatar slot='start'>
-                        <IonImg src={recipientInfo.profilePicture} />
+                        <IonImg src={(params.id === 'admin')?companyLogo:recipientInfo.profilePicture} />
                     </IonAvatar>
                     <IonLabel>
                         <h1 className='recipient-name'>{recipientInfo.name}</h1>
-                        <h2 className={`recipient-status-${userOnline}`}>{(userOnline === true)?'online':'offline'}</h2>
+                        <h2 className={`recipient-status-${userOnline}`}>{(params.id !== 'admin')?((userOnline === true)?'online':'offline'):''}</h2>
                     </IonLabel>
                 </IonToolbar>
             </IonHeader>

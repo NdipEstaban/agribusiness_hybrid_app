@@ -27,7 +27,7 @@ interface HomeProps{
 
 const Home:React.FC<HomeProps> = ({addOrder, socket}):JSX.Element => {
     const user = useAppSelector(state => state.user);
-    const [numberOfNewNotifications, setNumberOfNewNotifications] = useState<number>(1);
+    const [numberOfNewNotifications, setNumberOfNewNotifications] = useState<number>(0);
 
     const [currentHome, setCurrentHome] = React.useState('Featured');
     const history = useHistory();

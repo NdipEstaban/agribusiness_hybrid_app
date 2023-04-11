@@ -33,6 +33,7 @@ const MessageChat:React.FC<chatItem> = ({userId, image, name, messages}):JSX.Ele
             <div className='message__chat-details'>
                 <IonText className='message__chat-details-name'>{name}</IonText>
                 <IonText className='message__chat-details-message'>
+                    {/* DISPLAY TEXT OF LAST CHAT */}
                     {
                         messages[messages.length - 1]?.text
                     }
@@ -40,11 +41,13 @@ const MessageChat:React.FC<chatItem> = ({userId, image, name, messages}):JSX.Ele
             </div>
             <div className='message__chat-min-details'>
                 <IonText className='message__chat-min-details-date'>
+                    {/* DISPLAY DATE OF LAST CHAT */}
                     {
                         messages[messages.length - 1]?.date
                     }
                 </IonText>
                 <IonBadge className="message__chat-min-details-indicator" color='none'>
+                    {/* DISPLAY STATUS OF LAST CHAT */}
                     {
                         (messages[messages.length - 1]?.recieved === false && messages[messages.length - 1].source === 'sender')?
                         <FontAwesomeIcon icon={faCheck} />

@@ -4,6 +4,24 @@ import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 
 const CHATS_KEY = "chats-data";
 
+const defaultChats = [{
+    userId:'admin',
+    name:"ABIC Customer service",
+    image:'',
+    messages:[
+        {
+            id:"welcome-message",
+            text:"Welcome to ABIC agribusiness platform, from this chat you can contact our customer service",
+            time:"",
+            date:"",
+            recieved:true,
+            source:"reciever",
+            sent:"true",
+            image:null
+        }
+    ]
+}]
+
 export interface chatItem{
     userId:string,
     name:string,
@@ -38,9 +56,16 @@ export const useChatsStorage = () => {
         const store = await newStore.create();
         setStore(store);
         //getting chats
-        const storedChats = await store.get(CHATS_KEY) || [];
-        console.log(storedChats);
-        setChats(storedChats);
+        let storedChats = await store.get(CHATS_KEY) || [];
+
+        //go through the chats and add the welcome chat if not already there
+        if(storedChats.filter((chat:chatItem) => chat.userId === 'admin').length <= 0){
+            storedChats = [...defaultChats,...storedChats];
+            setChats(storedChats);
+            store?.set(CHATS_KEY, storedChats)
+        }else{
+            // setChats([...defaultChats,...storedChats]);
+        }
     }
 
     useEffect(() => {

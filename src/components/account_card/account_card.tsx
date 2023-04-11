@@ -35,7 +35,7 @@ const AccountCard:React.FC<AccountCardProps> = (props):JSX.Element => {
                         {props.description?.split('').filter((i:string) => i !== ' ').join('').length > 0?
                             <>{props.description}</>
                         :
-                        <>No description added, edit your description by tapping on the <FontAwesomeIcon icon={faPen} /> button</>
+                        <>No description added, edit your description by tapping on the <FontAwesomeIcon icon={faPen} /></>
                         }
                     </IonText>
                 </div>

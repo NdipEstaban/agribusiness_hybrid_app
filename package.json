@@ -2,6 +2,7 @@
   "name": "ionic-app-base",
   "version": "0.1.0",
   "private": true,
+  "proxy":"https://agribusiness-backend.onrender.com",
   "dependencies": {
     "@capacitor/android": "4.7.0",
     "@capacitor/app": "4.1.1",
